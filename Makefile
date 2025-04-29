@@ -1,6 +1,25 @@
 # Makefile for Go project
 # This Makefile provides a set of commands to manage the Go project, including building, testing, and generating database models.
+PKG := ticket-reservation
+GOLINT ?= golangci-lint
+GO_FILES = $(shell go list ./... | grep -v -e /mocks -e /example)
+GO_BIN = $(shell go env GOPATH)/bin
 
+
+# install target installs the necessary Go tools.
+install:
+	@echo "Installing Go tools... 🚀"
+	@test -e $(GO_BIN)/mockgen || go install github.com/golang/mock/mockgen@v1.7.0-rc.1
+	@test -e $(GO_BIN)/swag || go install github.com/swaggo/swag/cmd/swag@latest
+	@echo "Go tools installed successfully. ✅"
+
+gen-swag:
+	@echo "Generating Swagger documentation... 📜"
+	@swag init \
+		--generalInfo ./internal/api/http/route/routes.go \
+		--output ./docs \
+		--outputTypes yml
+	@echo "Swagger documentation generated successfully. ✅"
 
 # gen-db target generates database models using go-jet.
 gen-db:
@@ -13,3 +32,15 @@ gen-mock:
 	@echo "Generating mock files... 🚧"
 	@go generate ./...
 	@echo "Mock files generated successfully. ✅"
+
+# vet target runs go vet on the project.
+vet:
+	@echo "Running go vet... 🔍"
+	@go vet $(GO_FILES)
+	@echo "go vet completed successfully. ✅"
+
+# fmt target formats the Go code.
+fmt:
+	@echo "Formatting Go code... 📝"
+	@go fmt $(GO_FILES)
+	@echo "Go code formatted successfully. ✅"

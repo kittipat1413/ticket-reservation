@@ -1,3 +1,18 @@
+// @title Ticket Reservation API
+// @version 1.0
+// @description This is a ticket reservation system API.
+
+// @contact.name Kittipat Poonyakariyakorn
+// @contact.email k.poonyakariyakorn@gmail.com
+
+// @host localhost:8080
+// @BasePath /
+// @schemes https http
+
+// @securityDefinitions.basic  BasicAuth
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 package httproute
 
 import (

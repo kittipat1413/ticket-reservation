@@ -1,0 +1,78 @@
+basePath: /
+definitions:
+  handler.LivenessResponse:
+    properties:
+      status:
+        type: string
+    type: object
+  handler.ReadinessResponse:
+    properties:
+      status:
+        type: string
+    type: object
+  httpresponse.ErrorResponse:
+    properties:
+      code:
+        type: string
+      data: {}
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: k.poonyakariyakorn@gmail.com
+    name: Kittipat Poonyakariyakorn
+  description: This is a ticket reservation system API.
+  title: Ticket Reservation API
+  version: "1.0"
+paths:
+  /health/liveness:
+    get:
+      description: Check the liveness of the service
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response
+          schema:
+            $ref: '#/definitions/handler.LivenessResponse'
+        default:
+          description: Default error response
+          schema:
+            $ref: '#/definitions/httpresponse.ErrorResponse'
+      security:
+      - BasicAuth: []
+      summary: Liveness
+      tags:
+      - HealthCheck
+  /health/readiness:
+    get:
+      description: Check the readiness of the service
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response
+          schema:
+            $ref: '#/definitions/handler.ReadinessResponse'
+        default:
+          description: Default error response
+          schema:
+            $ref: '#/definitions/httpresponse.ErrorResponse'
+      security:
+      - BasicAuth: []
+      summary: Readiness
+      tags:
+      - HealthCheck
+schemes:
+- https
+- http
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+  BasicAuth:
+    type: basic
+swagger: "2.0"
