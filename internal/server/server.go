@@ -3,18 +3,19 @@ package server
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"ticket-reservation/internal/api/http/middleware"
 	httproute "ticket-reservation/internal/api/http/route"
 	"ticket-reservation/internal/config"
 	"ticket-reservation/internal/domain/errs"
 	"ticket-reservation/internal/util/httpresponse"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	errsFramework "github.com/kittipat1413/go-common/framework/errors"
 	"github.com/kittipat1413/go-common/framework/logger"
 	middlewareFramework "github.com/kittipat1413/go-common/framework/middleware/gin"
+	"github.com/kittipat1413/go-common/framework/serverutils"
 	"github.com/kittipat1413/go-common/framework/trace"
 	"github.com/kittipat1413/go-common/util/pointer"
 	"github.com/sony/gobreaker"
@@ -38,6 +39,7 @@ func New() *Server {
 func (s *Server) Start() error {
 	// Initialize context
 	ctx := context.Background()
+
 	// Initialize error framework (setup error prefix {prefix}-{error code})
 	errsFramework.SetServicePrefix(s.cfg.ServiceErrPrefix())
 
@@ -46,11 +48,6 @@ func (s *Server) Start() error {
 	if err != nil {
 		return fmt.Errorf("failed to initialize tracer provider: %w", err)
 	}
-	defer func() {
-		if err := tracerProvider.Shutdown(ctx); err != nil {
-			log.Printf("failed to shutdown tracer provider: %v", err)
-		}
-	}()
 
 	// Initialize logger
 	logConfig := logger.Config{
@@ -61,6 +58,10 @@ func (s *Server) Start() error {
 	appLogger, err := logger.NewLogger(logConfig)
 	if err != nil {
 		return fmt.Errorf("failed to initialize logger: %w", err)
+	}
+	// Set default logger config
+	if err = logger.SetDefaultLoggerConfig(logConfig); err != nil {
+		return fmt.Errorf("failed to set default logger config: %w", err)
 	}
 
 	// Initialize database connection
@@ -99,12 +100,46 @@ func (s *Server) Start() error {
 	})
 	appRoutes.RegisterRoutes(router)
 
-	/*
-		// !!!!!!!! gracefulshutdown here !!!!!!!!
-	*/
+	// Create http.Server
+	httpServer := &http.Server{
+		Addr:    s.cfg.ServicePort(),
+		Handler: router,
+	}
 
-	appLogger.Info(ctx, "server started", logger.Fields{"service_name": s.cfg.ServiceName(), "service_env": s.cfg.ServiceEnv(), "service_port": s.cfg.ServicePort()})
-	return router.Run(s.cfg.ServicePort())
+	errCh := make(chan error, 1)
+
+	// Run server in goroutine
+	go func() {
+		appLogger.Info(ctx, "server started", logger.Fields{"service_name": s.cfg.ServiceName(), "service_env": s.cfg.ServiceEnv(), "service_port": s.cfg.ServicePort()})
+		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			errCh <- fmt.Errorf("http server error: %w", err)
+		}
+	}()
+
+	// Wait for shutdown signal
+	shutdownDoneCh := serverutils.GracefulShutdownSystem(
+		ctx,
+		appLogger,
+		errCh,
+		30*time.Second,
+		map[string]serverutils.ShutdownOperation{
+			"HTTP Server": func(ctx context.Context) error {
+				return httpServer.Shutdown(ctx)
+			},
+			"Tracer Provider": func(ctx context.Context) error {
+				return tracerProvider.Shutdown(ctx)
+			},
+			"Database connection": func(ctx context.Context) error {
+				return db.Close()
+			},
+			// Other resources can be added here (e.g., Redis, etc.)
+		},
+	)
+	// Wait for shutdown to complete
+	<-shutdownDoneCh
+
+	appLogger.Info(ctx, "server shutdown complete", nil)
+	return nil
 }
 
 func (s *Server) setupMiddlewares(appLogger logger.Logger, tracerProvider *sdktrace.TracerProvider) []gin.HandlerFunc {
