@@ -15,7 +15,7 @@ var printConfigCmd = &cobra.Command{
 }
 
 func runPrintConfigCmd(cmd *cobra.Command, args []string) error {
-	configs := config.MustConfigure().AllConfigurations()
+	configs := config.MustConfigure().Source.All()
 	for key, value := range configs {
 		fmt.Printf("%s: %v\n", key, value)
 	}

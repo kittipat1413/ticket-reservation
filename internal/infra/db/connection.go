@@ -31,32 +31,26 @@ func MustConnect(cfg *config.Config) *sqlx.DB {
 	return db
 }
 
-func Connect(cfg *config.Config, tracerProvider *sdktrace.TracerProvider) (*sqlx.DB, error) {
-	dbConfig, err := cfg.DatabaseConfig()
-	if err != nil {
-		return nil, fmt.Errorf("invalid database config: %w", err)
-	}
-
-	var db *sqlx.DB
+func Connect(cfg *config.Config, tracerProvider *sdktrace.TracerProvider) (db *sqlx.DB, err error) {
 	if tracerProvider == nil {
 		// Without tracing
-		db, err = sqlx.Open("postgres", dbConfig.URL)
+		db, err = sqlx.Open("postgres", cfg.DB.URL)
 		if err != nil {
 			return nil, fmt.Errorf("failed to connect to DB (sqlx.Open): %w", err)
 		}
 	} else {
 		// With tracing
-		db, err = otelsqlx.Open("postgres", dbConfig.URL, otelsql.WithTracerProvider(tracerProvider))
+		db, err = otelsqlx.Open("postgres", cfg.DB.URL, otelsql.WithTracerProvider(tracerProvider))
 		if err != nil {
 			return nil, fmt.Errorf("failed to connect to DB (otelsqlx.Open): %w", err)
 		}
 	}
 
 	// Set connection pool settings
-	db.SetMaxOpenConns(dbConfig.MaxOpenConns)
-	db.SetMaxIdleConns(dbConfig.MaxIdleConns)
-	db.SetConnMaxLifetime(dbConfig.ConnMaxLifetime)
-	db.SetConnMaxIdleTime(dbConfig.ConnMaxIdleTime)
+	db.SetMaxOpenConns(cfg.DB.MaxOpenConns)
+	db.SetMaxIdleConns(cfg.DB.MaxIdleConns)
+	db.SetConnMaxLifetime(cfg.DB.ConnMaxLifetime)
+	db.SetConnMaxIdleTime(cfg.DB.ConnMaxIdleTime)
 
 	return db, nil
 }

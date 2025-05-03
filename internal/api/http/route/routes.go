@@ -28,7 +28,7 @@ type Router interface {
 }
 
 type router struct {
-	cfg                *config.Config                   // Configuration for the application
+	cfg                config.AppConfig                 // Configuration for the application
 	Middleware         middleware.Middleware            // Middleware for handling requests
 	HealthCheckHandler healthHandler.HealthCheckHandler // Handler for health check routes
 }
@@ -39,7 +39,7 @@ type Dependency struct {
 }
 
 // NewHTTPRoutes creates a new instance of Router with the provided configuration and dependencies
-func NewHTTPRoutes(cfg *config.Config, dep Dependency) Router {
+func NewHTTPRoutes(cfg config.AppConfig, dep Dependency) Router {
 	return &router{
 		cfg:                cfg,
 		Middleware:         dep.Middleware,
@@ -56,7 +56,7 @@ func (r *router) RegisterRoutes(router *gin.Engine) {
 func (r *router) applyHealthCheckRoutes(router *gin.Engine) {
 	healthRoute := router.Group("/health")
 	{
-		healthRoute.GET("/liveness", r.Middleware.BasicAuth(r.cfg.AdminApiKey(), r.cfg.AdminApiSecret()), r.HealthCheckHandler.Liveness)
-		healthRoute.GET("/readiness", r.Middleware.BasicAuth(r.cfg.AdminApiKey(), r.cfg.AdminApiSecret()), r.HealthCheckHandler.Readiness)
+		healthRoute.GET("/liveness", r.Middleware.BasicAuth(r.cfg.AdminAPIKey, r.cfg.AdminAPISecret), r.HealthCheckHandler.Liveness)
+		healthRoute.GET("/readiness", r.Middleware.BasicAuth(r.cfg.AdminAPIKey, r.cfg.AdminAPISecret), r.HealthCheckHandler.Readiness)
 	}
 }

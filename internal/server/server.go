@@ -32,8 +32,9 @@ type Server struct {
 }
 
 func New() *Server {
-	cfg := config.MustConfigure()
-	return &Server{cfg}
+	return &Server{
+		cfg: config.MustConfigure(),
+	}
 }
 
 func (s *Server) Start() error {
@@ -41,10 +42,15 @@ func (s *Server) Start() error {
 	ctx := context.Background()
 
 	// Initialize error framework (setup error prefix {prefix}-{error code})
-	errsFramework.SetServicePrefix(s.cfg.ServiceErrPrefix())
+	errsFramework.SetServicePrefix(s.cfg.Service.ErrorPrefix)
 
 	// Initialize Tracer Provider
-	tracerProvider, err := trace.InitTracerProvider(ctx, s.cfg.ServiceName(), pointer.ToPointer(s.cfg.OtelExporter()), trace.ExporterGRPC)
+	tracerProvider, err := trace.InitTracerProvider(
+		ctx,
+		s.cfg.Service.Name,
+		pointer.ToPointer(s.cfg.Service.OtelExporter),
+		trace.ExporterGRPC,
+	)
 	if err != nil {
 		return fmt.Errorf("failed to initialize tracer provider: %w", err)
 	}
@@ -52,8 +58,8 @@ func (s *Server) Start() error {
 	// Initialize logger
 	logConfig := logger.Config{
 		Level:       logger.INFO,
-		Environment: s.cfg.ServiceEnv(),
-		ServiceName: s.cfg.ServiceName(),
+		ServiceName: s.cfg.Service.Name,
+		Environment: s.cfg.Service.Env,
 	}
 	appLogger, err := logger.NewLogger(logConfig)
 	if err != nil {
@@ -94,7 +100,7 @@ func (s *Server) Start() error {
 	healthcheckHandler := healthcheckHandler.NewHealthCheckHandler(healthcheckUsecase)
 
 	// Register application routes
-	appRoutes := httproute.NewHTTPRoutes(s.cfg, httproute.Dependency{
+	appRoutes := httproute.NewHTTPRoutes(s.cfg.App, httproute.Dependency{
 		Middleware:         appMiddleware,
 		HealthCheckHandler: healthcheckHandler,
 	})
@@ -102,7 +108,7 @@ func (s *Server) Start() error {
 
 	// Create http.Server
 	httpServer := &http.Server{
-		Addr:    s.cfg.ServicePort(),
+		Addr:    s.cfg.Service.Port,
 		Handler: router,
 	}
 
@@ -110,7 +116,11 @@ func (s *Server) Start() error {
 
 	// Run server in goroutine
 	go func() {
-		appLogger.Info(ctx, "server started", logger.Fields{"service_name": s.cfg.ServiceName(), "service_env": s.cfg.ServiceEnv(), "service_port": s.cfg.ServicePort()})
+		appLogger.Info(ctx, "server started", logger.Fields{
+			"service_name": s.cfg.Service.Name,
+			"service_env":  s.cfg.Service.Env,
+			"service_port": s.cfg.Service.Port,
+		})
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			errCh <- fmt.Errorf("http server error: %w", err)
 		}
@@ -135,9 +145,9 @@ func (s *Server) Start() error {
 			// Other resources can be added here (e.g., Redis, etc.)
 		},
 	)
+
 	// Wait for shutdown to complete
 	<-shutdownDoneCh
-
 	appLogger.Info(ctx, "server shutdown complete", nil)
 	return nil
 }
@@ -164,13 +174,11 @@ func (s *Server) setupMiddlewares(appLogger logger.Logger, tracerProvider *sdktr
 		// CircuitBreaker middleware
 		middlewareFramework.CircuitBreaker(
 			middlewareFramework.WithCircuitBreakerSettings(gobreaker.Settings{
-				Name: fmt.Sprintf("%s-circuit-breaker", s.cfg.ServiceName()),
+				Name: fmt.Sprintf("%s-circuit-breaker", s.cfg.Service.Name),
 			}),
 			middlewareFramework.WithCircuitBreakerFilter(isNotHealthCheck),
 			middlewareFramework.WithCircuitBreakerErrorHandler(s.circuitBreakerHandler),
 		),
-		// Middleware to insert config into request context
-		s.insertCfg(),
 	}
 
 	return middlewares
@@ -189,10 +197,4 @@ func (s *Server) recoveryHandler(c *gin.Context, err interface{}) {
 
 func (s *Server) circuitBreakerHandler(c *gin.Context) {
 	httpresponse.Error(c, errs.NewServiceCircuitBreakerError(nil))
-}
-
-func (s *Server) insertCfg() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Request = config.NewRequest(c.Request, s.cfg)
-	}
 }

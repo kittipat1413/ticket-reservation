@@ -45,7 +45,7 @@ func runMigrateCmd(cmd *cobra.Command, args []string) error {
 
 	m, err := migrate.New(
 		"file://"+dir,
-		cfg.DatabaseURL(),
+		cfg.DB.URL,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to create migrate instance: %w", err)

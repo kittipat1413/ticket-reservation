@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+
 	"ticket-reservation/internal/config"
 
 	"github.com/go-jet/jet/v2/generator/metadata"
@@ -41,7 +42,7 @@ func runGenerateSQLBuilderCmd(cmd *cobra.Command, args []string) error {
 
 	log.Println("Starting SQL builder code generation...")
 
-	if err := generateSQLBuilder(cfg, schema, dir); err != nil {
+	if err := generateSQLBuilder(cfg.DB.URL, schema, dir); err != nil {
 		return fmt.Errorf("failed to generate SQL builder files: %w", err)
 	}
 
@@ -49,13 +50,13 @@ func runGenerateSQLBuilderCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func generateSQLBuilder(cfg *config.Config, schema string, dir string) error {
+func generateSQLBuilder(databaseUrl string, schema string, dir string) error {
 	// Generate SQL builder files using go-jet
 	// documentation: https://github.com/go-jet/jet/wiki/Generator
 	err := postgres.GenerateDSN(
-		cfg.DatabaseURL(), // database connection
-		schema,            // schema name
-		dir,               // output directory
+		databaseUrl, // database connection
+		schema,      // schema name
+		dir,         // output directory
 		template.Default(jetPostgres.Dialect).
 			UseSchema(func(schema metadata.Schema) template.Schema {
 				return template.DefaultSchema(schema).
