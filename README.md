@@ -33,7 +33,7 @@ ticket-reservation/
 │   │   ├── 202504221350_init.down.sql
 │   │   └── ...
 |── docs/                         # Documentation files
-│   └── swagger.yaml			  # API documentation in Swagger format
+│   └── swagger.yaml              # API documentation in Swagger format
 ├── internal/                     # Internal application code
 │   ├── api/                      # Delivery layer (HTTP handlers, routes, middleware)
 │   │   ├── http/
