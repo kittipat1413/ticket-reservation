@@ -3,11 +3,44 @@ definitions:
   handler.LivenessResponse:
     properties:
       status:
+        example: OK
         type: string
     type: object
   handler.ReadinessResponse:
     properties:
       status:
+        example: OK
+        type: string
+    type: object
+  handler.createConcertRequest:
+    properties:
+      date:
+        example: "2025-01-01T10:00:00+07:00"
+        type: string
+      name:
+        example: Concert Name
+        type: string
+      venue:
+        example: Concert Venue
+        type: string
+    required:
+    - date
+    - name
+    - venue
+    type: object
+  handler.createConcertResponse:
+    properties:
+      date:
+        example: "2025-01-01T10:00:00+07:00"
+        type: string
+      id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      name:
+        example: Concert Name
+        type: string
+      venue:
+        example: Concert Venue
         type: string
     type: object
   httpresponse.ErrorResponse:
@@ -27,6 +60,36 @@ info:
   title: Ticket Reservation API
   version: "1.0"
 paths:
+  /concerts:
+    post:
+      consumes:
+      - application/json
+      description: Create a new concert
+      parameters:
+      - description: Concert creation input
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createConcertRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Concert created
+          schema:
+            $ref: '#/definitions/handler.createConcertResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/httpresponse.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/httpresponse.ErrorResponse'
+      summary: Create Concert
+      tags:
+      - Concert
   /health/liveness:
     get:
       description: Check the liveness of the service

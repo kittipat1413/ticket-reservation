@@ -71,6 +71,11 @@ func generateSQLBuilder(databaseUrl string, schema string, dir string) error {
 										field.Type = template.NewType(&decimal.Decimal{})
 									}
 
+									// Add struct tags
+									field = field.UseTags(
+										fmt.Sprintf(`db:"%s.%s"`, table.Name, column.Name),
+									)
+
 									return field
 								})
 						}),

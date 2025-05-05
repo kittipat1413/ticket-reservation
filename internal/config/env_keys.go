@@ -9,6 +9,7 @@ const (
 	OtelExporterKey     = "OTEL_EXPORTER_OTLP_ENDPOINT"
 	AdminApiKey         = "ADMIN_API_KEY"
 	AdminApiSecret      = "ADMIN_API_SECRET"
+	AppTimezoneKey      = "APP_TIMEZONE"
 )
 
 // Database configuration environment variable keys
@@ -27,6 +28,7 @@ var configDefaults = map[string]any{
 	ServiceNameKey:      "ticket-reservation-api",
 	ServicePortKey:      ":8080",
 	ServiceEnvKey:       "development",
+	AppTimezoneKey:      "Asia/Bangkok",
 	ServiceErrPrefixKey: "TR",
 	// Database configuration
 	DatabaseUrlKey:             "postgres:///ticket-reservation?sslmode=disable",

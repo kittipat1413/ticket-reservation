@@ -7,7 +7,7 @@ import (
 )
 
 type LivenessResponse struct {
-	Status string `json:"status"`
+	Status string `json:"status" example:"OK"`
 }
 
 // @Summary Liveness
@@ -19,10 +19,10 @@ type LivenessResponse struct {
 // @Failure default {object} httpresponse.ErrorResponse "Default error response"
 // @Router /health/liveness [get]
 func (h *healthCheckHandler) Liveness(c *gin.Context) {
-	httpresponse.Success(c, newLivenessResponse())
+	httpresponse.Success(c, h.newLivenessResponse())
 }
 
-func newLivenessResponse() LivenessResponse {
+func (h *healthCheckHandler) newLivenessResponse() LivenessResponse {
 	return LivenessResponse{
 		Status: "OK",
 	}

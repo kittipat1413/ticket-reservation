@@ -13,6 +13,12 @@ install:
 	@test -e $(GO_BIN)/swag || go install github.com/swaggo/swag/cmd/swag@latest
 	@echo "Go tools installed successfully. ✅"
 
+# gen-all target generates all necessary files.
+# It runs gen-swag, gen-db, and gen-mock targets.
+gen-all: gen-swag gen-db gen-mock
+
+# gen-swag target generates Swagger documentation using swag.
+# docs: https://github.com/swaggo/swag?tab=readme-ov-file#declarative-comments-format
 gen-swag:
 	@echo "Generating Swagger documentation... 📜"
 	@swag init \
@@ -22,6 +28,7 @@ gen-swag:
 	@echo "Swagger documentation generated successfully. ✅"
 
 # gen-db target generates database models using go-jet.
+# docs: https://github.com/go-jet/jet/wiki/Generator
 gen-db:
 	@echo "Generating database models... 🚧"
 	@go run main.go generate-db

@@ -21,9 +21,13 @@ import (
 	"github.com/sony/gobreaker"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 
+	infraDB "ticket-reservation/internal/infra/db"
+
+	concertHandler "ticket-reservation/internal/api/http/handler/concert"
 	healthcheckHandler "ticket-reservation/internal/api/http/handler/healthcheck"
-	"ticket-reservation/internal/infra/db"
+	concertRepoImpl "ticket-reservation/internal/infra/db/concert"
 	healthcheckRepoImpl "ticket-reservation/internal/infra/db/healthcheck"
+	concertUsecase "ticket-reservation/internal/usecase/concert"
 	healthcheckUsecase "ticket-reservation/internal/usecase/healthcheck"
 )
 
@@ -71,7 +75,7 @@ func (s *Server) Start() error {
 	}
 
 	// Initialize database connection
-	db, err := db.Connect(s.cfg, tracerProvider)
+	db, err := infraDB.Connect(s.cfg, tracerProvider)
 	if err != nil {
 		return fmt.Errorf("failed to connect to database: %w", err)
 	}
@@ -91,18 +95,23 @@ func (s *Server) Start() error {
 	})
 
 	// Repository
+	transactorFactory := infraDB.NewSqlxTransactorFactory(db)
 	healthCheckRepository := healthcheckRepoImpl.NewHealthCheckRepository(db)
+	concertRepository := concertRepoImpl.NewConcertRepository(db)
 	// Usecase
 	healthcheckUsecase := healthcheckUsecase.NewHealthCheckUsecase(healthCheckRepository)
+	concertUsecase := concertUsecase.NewConcertUsecase(s.cfg.App, transactorFactory, concertRepository)
 	// Application middleware
 	appMiddleware := middleware.New()
 	// Handler
 	healthcheckHandler := healthcheckHandler.NewHealthCheckHandler(healthcheckUsecase)
+	concertHandler := concertHandler.NewConcertHandler(s.cfg.App, concertUsecase)
 
 	// Register application routes
 	appRoutes := httproute.NewHTTPRoutes(s.cfg.App, httproute.Dependency{
 		Middleware:         appMiddleware,
 		HealthCheckHandler: healthcheckHandler,
+		ConcertHandler:     concertHandler,
 	})
 	appRoutes.RegisterRoutes(router)
 

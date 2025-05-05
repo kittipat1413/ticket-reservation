@@ -7,7 +7,7 @@ import (
 )
 
 type ReadinessResponse struct {
-	Status string `json:"status"`
+	Status string `json:"status" example:"OK"`
 }
 
 // @Summary Readiness
@@ -24,10 +24,10 @@ func (h *healthCheckHandler) Readiness(c *gin.Context) {
 		httpresponse.Error(c, err)
 		return
 	}
-	httpresponse.Success(c, newReadinessResponse())
+	httpresponse.Success(c, h.newReadinessResponse())
 }
 
-func newReadinessResponse() ReadinessResponse {
+func (h *healthCheckHandler) newReadinessResponse() ReadinessResponse {
 	return ReadinessResponse{
 		Status: "OK",
 	}

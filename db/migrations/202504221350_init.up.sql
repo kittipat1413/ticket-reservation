@@ -42,7 +42,7 @@ CREATE TABLE reservations (
     seat_id UUID NOT NULL REFERENCES seats(id) ON DELETE CASCADE,
     session_id TEXT NOT NULL,
     status TEXT NOT NULL CHECK (status IN ('pending', 'confirmed', 'expired')),
-    reserved_at TIMESTAMPTZ DEFAULT NOW(),
+    reserved_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     expires_at TIMESTAMPTZ NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
