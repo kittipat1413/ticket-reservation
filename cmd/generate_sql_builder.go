@@ -67,11 +67,15 @@ func generateSQLBuilder(databaseUrl string, schema string, dir string) error {
 									field := template.DefaultTableModelField(column)
 
 									// Customize the field type for specific columns
+									// For example, map payments.amount to *decimal.Decimal
 									if schema.Name == "public" && table.Name == "payments" && column.Name == "amount" {
 										field.Type = template.NewType(&decimal.Decimal{})
 									}
 
-									// Add struct tags
+									// Add `db` struct tag to map Jet's fully-qualified column name (e.g., "concerts.name")
+									// This ensures compatibility with sqlx, which relies on struct tags to map query results.
+									// Jet generates queries like: SELECT concerts.name AS "concerts.name"
+									// So we must use: `db:"concerts.name"` for correct mapping.
 									field = field.UseTags(
 										fmt.Sprintf(`db:"%s.%s"`, table.Name, column.Name),
 									)
