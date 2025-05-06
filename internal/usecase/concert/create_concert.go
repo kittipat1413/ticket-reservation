@@ -31,10 +31,10 @@ func (u *concertUsecase) CreateConcert(ctx context.Context, input CreateConcertI
 			return nil, errsFramework.WrapError(err, errsFramework.NewInternalServerError("failed to create validator", nil))
 		}
 
-		// Validate input
+		// Validate Input
 		err = vInstance.Struct(input)
 		if err != nil {
-			return nil, errsFramework.WrapError(err, errsFramework.NewBadRequestError("invalid input", map[string]string{"details": err.Error()}))
+			return nil, errsFramework.WrapError(err, errsFramework.NewBadRequestError("the request is invalid", map[string]string{"details": err.Error()}))
 		}
 
 		concert := &entity.Concert{
