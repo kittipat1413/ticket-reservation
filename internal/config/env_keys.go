@@ -6,7 +6,7 @@ const (
 	ServicePortKey      = "SERVICE_PORT"
 	ServiceEnvKey       = "SERVICE_ENV"
 	ServiceErrPrefixKey = "SERVICE_ERR_PREFIX"
-	OtelExporterKey     = "OTEL_EXPORTER_OTLP_ENDPOINT"
+	OtelExporterKey     = "OTEL_COLLECTOR_ENDPOINT"
 	AdminApiKey         = "ADMIN_API_KEY"
 	AdminApiSecret      = "ADMIN_API_SECRET"
 	AppTimezoneKey      = "APP_TIMEZONE"

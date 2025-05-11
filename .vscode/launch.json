@@ -11,7 +11,9 @@
             "mode": "auto",
             "program": "${workspaceRoot}/main.go",
             "args": ["server"],
-            "env": {}
+            "env": {
+                "OTEL_RESOURCE_ATTRIBUTES": "deployment.environment.name=local,service.version=1.0.0"
+            }
         }
     ]
 }
