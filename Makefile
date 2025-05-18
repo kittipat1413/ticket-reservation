@@ -21,6 +21,7 @@ gen-all: gen-swag gen-db gen-mock
 # docs: https://github.com/swaggo/swag?tab=readme-ov-file#declarative-comments-format
 gen-swag:
 	@echo "Generating Swagger documentation... 📜"
+	@swag fmt
 	@swag init \
 		--generalInfo ./internal/api/http/route/routes.go \
 		--output ./docs \

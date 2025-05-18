@@ -24,16 +24,16 @@ type createConcertResponse struct {
 	Date  string `json:"date" example:"2025-01-01T10:00:00+07:00"`
 }
 
-// @Summary Create Concert
-// @Description Create a new concert
-// @Tags Concert
-// @Accept json
-// @Produce json
-// @Param request body createConcertRequest true "Concert creation input"
-// @Success 201 {object} createConcertResponse "Concert created"
-// @Failure 400 {object} httpresponse.ErrorResponse "Bad request"
-// @Failure 500 {object} httpresponse.ErrorResponse "Internal server error"
-// @Router /concerts [post]
+//	@Summary		Create Concert
+//	@Description	Create a new concert
+//	@Tags			Concert
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		createConcertRequest		true	"Concert creation input"
+//	@Success		201		{object}	createConcertResponse		"Concert created"
+//	@Failure		400		{object}	httpresponse.ErrorResponse	"Bad request"
+//	@Failure		500		{object}	httpresponse.ErrorResponse	"Internal server error"
+//	@Router			/concerts [post]
 func (h *concertHandler) CreateConcert(c *gin.Context) {
 	var input createConcertRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
