@@ -4,31 +4,19 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"ticket-reservation/internal/api/http/middleware"
 	httproute "ticket-reservation/internal/api/http/route"
 	"ticket-reservation/internal/config"
-	"ticket-reservation/internal/domain/errs"
 	"ticket-reservation/internal/util/httpresponse"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	errsFramework "github.com/kittipat1413/go-common/framework/errors"
 	"github.com/kittipat1413/go-common/framework/logger"
-	middlewareFramework "github.com/kittipat1413/go-common/framework/middleware/gin"
 	"github.com/kittipat1413/go-common/framework/serverutils"
 	"github.com/kittipat1413/go-common/framework/trace"
 	"github.com/kittipat1413/go-common/util/pointer"
-	"github.com/sony/gobreaker"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 
 	infraDB "ticket-reservation/internal/infra/db"
-
-	concertHandler "ticket-reservation/internal/api/http/handler/concert"
-	healthcheckHandler "ticket-reservation/internal/api/http/handler/healthcheck"
-	concertRepoImpl "ticket-reservation/internal/infra/db/concert"
-	healthcheckRepoImpl "ticket-reservation/internal/infra/db/healthcheck"
-	concertUsecase "ticket-reservation/internal/usecase/concert"
-	healthcheckUsecase "ticket-reservation/internal/usecase/healthcheck"
 )
 
 type Server struct {
@@ -94,25 +82,13 @@ func (s *Server) Start() error {
 		httpresponse.Error(c, errsFramework.NewNotFoundError("the requested endpoint is not registered", nil))
 	})
 
-	// Repository
-	transactorFactory := infraDB.NewSqlxTransactorFactory(db)
-	healthCheckRepository := healthcheckRepoImpl.NewHealthCheckRepository(db)
-	concertRepository := concertRepoImpl.NewConcertRepository(db)
-	// Usecase
-	healthcheckUsecase := healthcheckUsecase.NewHealthCheckUsecase(healthCheckRepository)
-	concertUsecase := concertUsecase.NewConcertUsecase(s.cfg.App, transactorFactory, concertRepository)
-	// Application middleware
-	appMiddleware := middleware.New()
-	// Handler
-	healthcheckHandler := healthcheckHandler.NewHealthCheckHandler(healthcheckUsecase)
-	concertHandler := concertHandler.NewConcertHandler(s.cfg.App, concertUsecase)
-
+	// Setup route dependencies
+	deps, err := s.setupRouteDependencies(ctx, tracerProvider, appLogger, db)
+	if err != nil {
+		return fmt.Errorf("failed to setup route dependencies: %w", err)
+	}
 	// Register application routes
-	appRoutes := httproute.NewHTTPRoutes(s.cfg.App, httproute.Dependency{
-		Middleware:         appMiddleware,
-		HealthCheckHandler: healthcheckHandler,
-		ConcertHandler:     concertHandler,
-	})
+	appRoutes := httproute.NewHTTPRoutes(s.cfg.App, deps)
 	appRoutes.RegisterRoutes(router)
 
 	// Create http.Server
@@ -159,51 +135,4 @@ func (s *Server) Start() error {
 	<-shutdownDoneCh
 	appLogger.Info(ctx, "server shutdown complete", nil)
 	return nil
-}
-
-func (s *Server) setupMiddlewares(appLogger logger.Logger, tracerProvider *sdktrace.TracerProvider) []gin.HandlerFunc {
-	var middlewares = []gin.HandlerFunc{
-		// Recovery middleware
-		middlewareFramework.Recovery(
-			middlewareFramework.WithRecoveryLogger(appLogger),
-			middlewareFramework.WithRecoveryHandler(s.recoveryHandler),
-		),
-		// Trace middleware
-		middlewareFramework.Trace(
-			middlewareFramework.WithTracerProvider(tracerProvider),
-			middlewareFramework.WithTraceFilter(isNotHealthCheck),
-		),
-		// RequestID middleware
-		middlewareFramework.RequestID(),
-		// RequestLogger middleware
-		middlewareFramework.RequestLogger(
-			middlewareFramework.WithRequestLogger(appLogger),
-			middlewareFramework.WithRequestLoggerFilter(isNotHealthCheck),
-		),
-		// CircuitBreaker middleware
-		middlewareFramework.CircuitBreaker(
-			middlewareFramework.WithCircuitBreakerSettings(gobreaker.Settings{
-				Name: fmt.Sprintf("%s-circuit-breaker", s.cfg.Service.Name),
-			}),
-			middlewareFramework.WithCircuitBreakerFilter(isNotHealthCheck),
-			middlewareFramework.WithCircuitBreakerErrorHandler(s.circuitBreakerHandler),
-		),
-	}
-
-	return middlewares
-}
-
-func isNotHealthCheck(req *http.Request) bool {
-	path := req.URL.Path
-	return path != "/health/liveness" && path != "/health/readiness"
-}
-
-func (s *Server) recoveryHandler(c *gin.Context, err interface{}) {
-	httpresponse.Error(c, errsFramework.NewInternalServerError("unexpected server error occurred", map[string]interface{}{
-		"panic": err,
-	}))
-}
-
-func (s *Server) circuitBreakerHandler(c *gin.Context) {
-	httpresponse.Error(c, errs.NewServiceCircuitBreakerError(nil))
 }

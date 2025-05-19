@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 
 	errsFramework "github.com/kittipat1413/go-common/framework/errors"
 	traceFramework "github.com/kittipat1413/go-common/framework/trace"
@@ -12,7 +13,17 @@ func (u *healthCheckUsecase) CheckReadiness(ctx context.Context) (ok bool, err e
 	defer errsFramework.WrapErrorWithPrefix(errLocation, &err)
 
 	return traceFramework.TraceFunc(ctx, traceFramework.GetTracer("healthcheck.usecase"), func(ctx context.Context) (bool, error) {
-		ok, err := u.healthcheckRepository.CheckDatabaseReadiness(ctx)
+		var ok bool
+		err := u.retrier.ExecuteWithRetry(ctx, func(ctx context.Context) error {
+			ok, err = u.healthcheckRepository.CheckDatabaseReadiness(ctx)
+			return err
+		}, func(attempt int, err error) bool {
+			var dbErr *errsFramework.DatabaseError
+			if errors.As(err, &dbErr) {
+				return true // retry if database is not ready
+			}
+			return false
+		})
 		if err != nil {
 			return false, errsFramework.WrapError(err, errsFramework.NewDatabaseError("database is not ready", nil))
 		}
