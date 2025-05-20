@@ -43,6 +43,7 @@ func (s *Server) setupMiddlewares(appLogger logger.Logger, tracerProvider *sdktr
 			middlewareFramework.WithCircuitBreakerFilter(isNotHealthCheck),
 			middlewareFramework.WithCircuitBreakerErrorHandler(s.circuitBreakerHandler),
 		),
+		middlewareFramework.Prometheus(s.cfg.Service.Name),
 	}
 }
 

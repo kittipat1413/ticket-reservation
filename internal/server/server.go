@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	errsFramework "github.com/kittipat1413/go-common/framework/errors"
 	"github.com/kittipat1413/go-common/framework/logger"
+	middlewareFramework "github.com/kittipat1413/go-common/framework/middleware/gin"
 	"github.com/kittipat1413/go-common/framework/serverutils"
 	"github.com/kittipat1413/go-common/framework/trace"
 	"github.com/kittipat1413/go-common/util/pointer"
@@ -90,6 +91,9 @@ func (s *Server) Start() error {
 	// Register application routes
 	appRoutes := httproute.NewHTTPRoutes(s.cfg.App, deps)
 	appRoutes.RegisterRoutes(router)
+
+	// Prometheus metrics
+	router.GET("/metrics", middlewareFramework.MetricsHandler())
 
 	// Create http.Server
 	httpServer := &http.Server{
