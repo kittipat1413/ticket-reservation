@@ -35,9 +35,11 @@ func runNewMigrationCmd(cmd *cobra.Command, args []string) error {
 
 	fmt.Printf("Creating migration files:\n- %s\n- %s\n", uppath, downpath)
 
+	// #nosec G306
 	if err := os.WriteFile(uppath, []byte("-- "+upname+"\n"), 0644); err != nil {
 		return err
 	}
+	// #nosec G306
 	if err := os.WriteFile(downpath, []byte("-- "+downname+"\n"), 0644); err != nil {
 		return err
 	}

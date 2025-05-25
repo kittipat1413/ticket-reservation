@@ -97,8 +97,9 @@ func (s *Server) Start() error {
 
 	// Create http.Server
 	httpServer := &http.Server{
-		Addr:    s.cfg.Service.Port,
-		Handler: router,
+		Addr:              s.cfg.Service.Port,
+		Handler:           router,
+		ReadHeaderTimeout: 15 * time.Second,
 	}
 
 	errCh := make(chan error, 1)

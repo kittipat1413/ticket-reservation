@@ -21,6 +21,7 @@ import (
 	healthcheckUsecase "ticket-reservation/internal/usecase/healthcheck"
 )
 
+//nolint:unparam
 func (s *Server) setupRouteDependencies(ctx context.Context, tracerProvider *sdktrace.TracerProvider, appLogger logger.Logger, dbConn *sqlx.DB) (httproute.Dependency, error) {
 	// Repositories
 	transactorFactory := db.NewSqlxTransactorFactory(dbConn)

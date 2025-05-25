@@ -7,8 +7,8 @@ const (
 	ServiceEnvKey       = "SERVICE_ENV"
 	ServiceErrPrefixKey = "SERVICE_ERR_PREFIX"
 	OtelExporterKey     = "OTEL_COLLECTOR_ENDPOINT"
-	AdminApiKey         = "ADMIN_API_KEY"
-	AdminApiSecret      = "ADMIN_API_SECRET"
+	AdminApiKey         = "ADMIN_API_KEY"    // #nosec G101
+	AdminApiSecret      = "ADMIN_API_SECRET" // #nosec G101
 	AppTimezoneKey      = "APP_TIMEZONE"
 )
 

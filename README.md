@@ -128,6 +128,7 @@ Here’s a brief overview of the key targets in the provided Makefile:
 - `gen-swag`: Generates Swagger documentation from code annotations.
 - `gen-db`: Generates database models using go-jet.
 - `gen-mock`: Generates mock files from code annotations.
+- `lint`: Runs Go’s linter to check for code quality issues.
 - `vet`: Runs Go’s vet tool for static analysis.
 - `fmt`: Formats the Go codebase.
 

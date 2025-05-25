@@ -9,10 +9,10 @@
 //	@BasePath	/
 //	@schemes	https http
 
-//	@securityDefinitions.basic	BasicAuth
-//	@securityDefinitions.apikey	ApiKeyAuth
-//	@in							header
-//	@name						Authorization
+// @securityDefinitions.basic	BasicAuth
+// @securityDefinitions.apikey	ApiKeyAuth
+// @in							header
+// @name						Authorization
 package httproute
 
 import (

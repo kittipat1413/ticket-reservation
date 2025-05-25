@@ -10,7 +10,7 @@ var rootCmd = &cobra.Command{
 	Use:   "app",
 	Short: "Starts the application",
 	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Help()
+		_ = cmd.Help()
 	},
 }
 

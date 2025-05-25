@@ -41,6 +41,12 @@ gen-mock:
 	@go generate ./...
 	@echo "Mock files generated successfully. ✅"
 
+# lint target runs the linters using golangci-lint.
+lint:
+	@echo "Running linters... 🧹"
+	@$(GOLINT) run
+	@echo "Linters completed successfully. ✅"
+
 # vet target runs go vet on the project.
 vet:
 	@echo "Running go vet... 🔍"
