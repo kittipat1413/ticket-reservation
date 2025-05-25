@@ -1,8 +1,42 @@
 services:
+  postgres:
+    image: postgres:14-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypass
+      POSTGRES_DB: ticket-reservation
+    ports:
+      - "5432:5432"
+    volumes:
+      - ticket_reservation_db_data:/var/lib/postgresql/data
+  redis:
+    image: "redis:alpine"
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - ticket_reservation_redis_data:/data
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.123.0
+    restart: unless-stopped
     volumes:
       - ./otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
     ports:
       - "4317:4317"
       - "4318:4318"
+  api:
+    build:
+      context: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: "postgres://postgres:mypass@postgres:5432/ticket-reservation?sslmode=disable"
+      OTEL_COLLECTOR_ENDPOINT: "otel-collector:4317"
+      ADMIN_API_KEY: "admin-api-key"
+      ADMIN_API_SECRET: "admin-api-secret"
+    command:  ["/bin/sh", "-c", "/app/ticket-reservation-service migrate && /app/ticket-reservation-service serve"]
+volumes:
+  ticket_reservation_db_data:
+  ticket_reservation_redis_data:

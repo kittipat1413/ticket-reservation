@@ -130,3 +130,10 @@ Here’s a brief overview of the key targets in the provided Makefile:
 - `gen-mock`: Generates mock files from code annotations.
 - `vet`: Runs Go’s vet tool for static analysis.
 - `fmt`: Formats the Go codebase.
+
+## 🚀 Getting Started
+### ⚡ Quick Start
+Spin up the full local dev environment using Docker Compose:
+```bash
+docker-compose up --build
+```
