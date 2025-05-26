@@ -3,6 +3,10 @@ A simple ticket reservation system for managing concert tickets, including seat 
 This project is designed to be a starting point for building a more complex ticket reservation system.
 > **Note:** The high-level system design, API design details, and architectural diagrams are available in the [`/docs`](./docs) directory.
 
+> **🧩 Powered by go-common:**
+This project integrates [go-common](https://github.com/kittipat1413/go-common) — our standardized backend framework — across all layers:
+Structured Logging, Error Handling, Config Loader (Viper), Validation & Middleware Utilities, Tracing & Retry Helpers and more...
+
 ## 📝 Overview
 
 The project leverages a Clean Architecture structure to cleanly separate concerns:
