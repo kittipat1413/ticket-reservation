@@ -9,8 +9,8 @@ import (
 )
 
 type ErrorResponse struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
+	Code    string `json:"code" example:"TR-XXXXXX"`
+	Message string `json:"message" example:"Error message"`
 	Data    any    `json:"data,omitempty"`
 }
 

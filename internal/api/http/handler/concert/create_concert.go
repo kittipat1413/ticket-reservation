@@ -29,10 +29,10 @@ type createConcertResponse struct {
 // @Tags			Concert
 // @Accept			json
 // @Produce		json
-// @Param			request	body		createConcertRequest		true	"Concert creation input"
-// @Success		201		{object}	createConcertResponse		"Concert created"
-// @Failure		400		{object}	httpresponse.ErrorResponse	"Bad request"
-// @Failure		500		{object}	httpresponse.ErrorResponse	"Internal server error"
+// @Param			request	body		createConcertRequest													true	"Concert creation input"
+// @Success		201		{object}	httpresponse.SuccessResponse{data=createConcertResponse,metadata=nil}	"Concert created"
+// @Failure		400		{object}	httpresponse.ErrorResponse{data=nil}									"Bad request"
+// @Failure		500		{object}	httpresponse.ErrorResponse{data=nil}									"Internal server error"
 // @Router			/concerts [post]
 func (h *concertHandler) CreateConcert(c *gin.Context) {
 	var input createConcertRequest

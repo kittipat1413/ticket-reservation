@@ -21,10 +21,11 @@ type findOneConcertResponse struct {
 // @Description	Retrieve concert details by its ID
 // @Tags			Concert
 // @Produce		json
-// @Param			id	path		string						true	"Concert ID"
-// @Success		200	{object}	findOneConcertResponse		"Concert found"
-// @Failure		404	{object}	httpresponse.ErrorResponse	"Concert not found"
-// @Failure		500	{object}	httpresponse.ErrorResponse	"Internal server error"
+// @Param			id	path		string																	true	"Concert ID"
+// @Success		200	{object}	httpresponse.SuccessResponse{data=findOneConcertResponse,metadata=nil}	"Concert found"
+// @Failure		400	{object}	httpresponse.ErrorResponse{data=nil}									"Bad request"
+// @Failure		404	{object}	httpresponse.ErrorResponse{data=nil}									"Concert not found"
+// @Failure		500	{object}	httpresponse.ErrorResponse{data=nil}									"Internal server error"
 // @Router			/concerts/{id} [get]
 func (h *concertHandler) FindConcertByID(c *gin.Context) {
 	concertID := c.Param("id")

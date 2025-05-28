@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ReadinessResponse struct {
+type readinessResponse struct {
 	Status string `json:"status" example:"OK"`
 }
 
@@ -15,8 +15,8 @@ type ReadinessResponse struct {
 // @Tags			HealthCheck
 // @security		BasicAuth
 // @Produce		json
-// @Success		200		{object}	ReadinessResponse			"Success response"
-// @Failure		default	{object}	httpresponse.ErrorResponse	"Default error response"
+// @Success		200		{object}	httpresponse.SuccessResponse{data=readinessResponse,metadata=nil}	"Success response"
+// @Failure		default	{object}	httpresponse.ErrorResponse{data=nil}								"Default error response"
 // @Router			/health/readiness [get]
 func (h *healthCheckHandler) Readiness(c *gin.Context) {
 	ok, err := h.healthcheckUsecase.CheckReadiness(c.Request.Context())
@@ -27,8 +27,8 @@ func (h *healthCheckHandler) Readiness(c *gin.Context) {
 	httpresponse.Success(c, h.newReadinessResponse())
 }
 
-func (h *healthCheckHandler) newReadinessResponse() ReadinessResponse {
-	return ReadinessResponse{
+func (h *healthCheckHandler) newReadinessResponse() readinessResponse {
+	return readinessResponse{
 		Status: "OK",
 	}
 }

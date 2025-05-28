@@ -72,10 +72,16 @@ func generateSQLBuilder(databaseUrl string, schema string, dir string) error {
 										field.Type = template.NewType(&decimal.Decimal{})
 									}
 
-									// Add `db` struct tag to map Jet's fully-qualified column name (e.g., "concerts.name")
-									// This ensures compatibility with sqlx, which relies on struct tags to map query results.
-									// Jet generates queries like: SELECT concerts.name AS "concerts.name"
-									// So we must use: `db:"concerts.name"` for correct mapping.
+									// Set the `db` struct tag to match Jet's fully-qualified column alias (e.g., `concerts.name`).
+									// This is required for correct mapping when using sqlx, which matches result columns to struct tags.
+									// For example, Jet generates: SELECT concerts.name AS "concerts.name"
+									// So we use: `db:"concerts.name"`
+									//
+									// Alternatively, you can remove the table alias in the generated SQL by calling .As("") on the column:
+									// e.g., concerts.Name.As("") will generate: SELECT name AS "name"
+									// In that case, the struct tag can simply be `db:"name"`
+									//
+									// Here, we keep the alias for clarity and consistency across queries.
 									field = field.UseTags(
 										fmt.Sprintf(`db:"%s.%s"`, table.Name, column.Name),
 									)

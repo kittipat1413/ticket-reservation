@@ -10,6 +10,7 @@ import (
 type ConcertHandler interface {
 	CreateConcert(c *gin.Context)
 	FindConcertByID(c *gin.Context)
+	FindAllConcerts(c *gin.Context)
 }
 
 type concertHandler struct {

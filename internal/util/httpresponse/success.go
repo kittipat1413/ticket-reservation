@@ -9,7 +9,7 @@ import (
 )
 
 type SuccessResponse struct {
-	Code     string `json:"code"`
+	Code     string `json:"code" example:"TR-200000"`
 	Data     any    `json:"data,omitempty"`
 	Metadata any    `json:"metadata,omitempty"`
 }

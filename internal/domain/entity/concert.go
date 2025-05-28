@@ -14,3 +14,5 @@ type Concert struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+type Concerts []Concert

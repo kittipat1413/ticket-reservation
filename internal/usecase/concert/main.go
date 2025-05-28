@@ -12,6 +12,7 @@ import (
 type ConcertUsecase interface {
 	CreateConcert(ctx context.Context, concert CreateConcertInput) (*entity.Concert, error)
 	FindOneConcert(ctx context.Context, id FindOneConcertInput) (*entity.Concert, error)
+	FindAllConcerts(ctx context.Context, input FindAllConcertsInput) (*entity.Concerts, error)
 }
 
 type concertUsecase struct {

@@ -53,6 +53,21 @@ func (mr *MockConcertRepositoryMockRecorder) CreateOne(ctx, concert interface{})
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOne", reflect.TypeOf((*MockConcertRepository)(nil).CreateOne), ctx, concert)
 }
 
+// FindAll mocks base method.
+func (m *MockConcertRepository) FindAll(ctx context.Context, filter repository.FindAllConcertsFilter) (*entity.Concerts, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindAll", ctx, filter)
+	ret0, _ := ret[0].(*entity.Concerts)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindAll indicates an expected call of FindAll.
+func (mr *MockConcertRepositoryMockRecorder) FindAll(ctx, filter interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockConcertRepository)(nil).FindAll), ctx, filter)
+}
+
 // FindOne mocks base method.
 func (m *MockConcertRepository) FindOne(ctx context.Context, id uuid.UUID) (*entity.Concert, error) {
 	m.ctrl.T.Helper()

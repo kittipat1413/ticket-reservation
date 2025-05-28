@@ -70,6 +70,7 @@ func (r *router) applyHealthCheckRoutes(router *gin.Engine) {
 func (r *router) applyConcertRoutes(router *gin.Engine) {
 	concertRoute := router.Group("/concerts")
 	{
+		concertRoute.GET("/", r.ConcertHandler.FindAllConcerts)
 		concertRoute.POST("/", r.ConcertHandler.CreateConcert)
 		concertRoute.GET("/:id", r.ConcertHandler.FindConcertByID)
 	}

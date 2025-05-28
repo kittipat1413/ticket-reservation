@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type LivenessResponse struct {
+type livenessResponse struct {
 	Status string `json:"status" example:"OK"`
 }
 
@@ -15,15 +15,15 @@ type LivenessResponse struct {
 // @Tags			HealthCheck
 // @security		BasicAuth
 // @Produce		json
-// @Success		200		{object}	LivenessResponse			"Success response"
-// @Failure		default	{object}	httpresponse.ErrorResponse	"Default error response"
+// @Success		200		{object}	httpresponse.SuccessResponse{data=livenessResponse,metadata=nil}	"Success response"
+// @Failure		default	{object}	httpresponse.ErrorResponse{data=nil}								"Default error response"
 // @Router			/health/liveness [get]
 func (h *healthCheckHandler) Liveness(c *gin.Context) {
 	httpresponse.Success(c, h.newLivenessResponse())
 }
 
-func (h *healthCheckHandler) newLivenessResponse() LivenessResponse {
-	return LivenessResponse{
+func (h *healthCheckHandler) newLivenessResponse() livenessResponse {
+	return livenessResponse{
 		Status: "OK",
 	}
 }
