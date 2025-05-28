@@ -5,7 +5,6 @@ GOLINT ?= golangci-lint
 GO_FILES = $(shell go list ./... | grep -v -e /mocks -e /example)
 GO_BIN = $(shell go env GOPATH)/bin
 
-
 # install target installs the necessary Go tools.
 install:
 	@echo "Installing Go tools... 🚀"

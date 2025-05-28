@@ -71,5 +71,6 @@ func (r *router) applyConcertRoutes(router *gin.Engine) {
 	concertRoute := router.Group("/concerts")
 	{
 		concertRoute.POST("/", r.ConcertHandler.CreateConcert)
+		concertRoute.GET("/:id", r.ConcertHandler.FindConcertByID)
 	}
 }

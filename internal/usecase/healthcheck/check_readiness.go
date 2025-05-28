@@ -25,7 +25,7 @@ func (u *healthCheckUsecase) CheckReadiness(ctx context.Context) (ok bool, err e
 			return false
 		})
 		if err != nil {
-			return false, errsFramework.WrapError(err, errsFramework.NewDatabaseError("database is not ready", nil))
+			return false, errsFramework.WrapError(err, errsFramework.NewInternalServerError("service is not ready", nil))
 		}
 		return ok, nil
 	})

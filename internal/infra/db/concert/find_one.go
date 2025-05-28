@@ -12,8 +12,8 @@ import (
 	errsFramework "github.com/kittipat1413/go-common/framework/errors"
 )
 
-func (r *concertRepositoryImpl) FindByID(ctx context.Context, id uuid.UUID) (concert *entity.Concert, err error) {
-	errLocation := "[repository concert/find_by_id FindByID] "
+func (r *concertRepositoryImpl) FindOne(ctx context.Context, id uuid.UUID) (concert *entity.Concert, err error) {
+	errLocation := "[repository concert/find_one FindOne] "
 	defer errsFramework.WrapErrorWithPrefix(errLocation, &err)
 
 	concertsTable := table.Concerts

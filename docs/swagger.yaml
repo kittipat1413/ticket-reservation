@@ -43,6 +43,21 @@ definitions:
         example: Concert Venue
         type: string
     type: object
+  handler.findOneConcertResponse:
+    properties:
+      date:
+        example: "2025-01-01T10:00:00+07:00"
+        type: string
+      id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      name:
+        example: Concert Name
+        type: string
+      venue:
+        example: Concert Venue
+        type: string
+    type: object
   httpresponse.ErrorResponse:
     properties:
       code:
@@ -88,6 +103,33 @@ paths:
           schema:
             $ref: '#/definitions/httpresponse.ErrorResponse'
       summary: Create Concert
+      tags:
+      - Concert
+  /concerts/{id}:
+    get:
+      description: Retrieve concert details by its ID
+      parameters:
+      - description: Concert ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Concert found
+          schema:
+            $ref: '#/definitions/handler.findOneConcertResponse'
+        "404":
+          description: Concert not found
+          schema:
+            $ref: '#/definitions/httpresponse.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/httpresponse.ErrorResponse'
+      summary: Find Concert by ID
       tags:
       - Concert
   /health/liveness:

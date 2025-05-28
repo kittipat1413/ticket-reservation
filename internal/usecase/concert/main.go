@@ -11,7 +11,7 @@ import (
 //go:generate mockgen -source=./main.go -destination=./mocks/concert_usecase.go -package=concert_usecasemocks
 type ConcertUsecase interface {
 	CreateConcert(ctx context.Context, concert CreateConcertInput) (*entity.Concert, error)
-	// GetConcertByID(ctx context.Context, id string) (*entity.Concert, error)
+	FindOneConcert(ctx context.Context, id FindOneConcertInput) (*entity.Concert, error)
 }
 
 type concertUsecase struct {

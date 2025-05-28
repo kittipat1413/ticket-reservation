@@ -2,30 +2,27 @@ package concert
 
 import (
 	"context"
+	"errors"
 	"ticket-reservation/internal/domain/entity"
-	customvalidator "ticket-reservation/pkg/validator"
-	"time"
 
+	"github.com/google/uuid"
 	errsFramework "github.com/kittipat1413/go-common/framework/errors"
 	traceFramework "github.com/kittipat1413/go-common/framework/trace"
 	"github.com/kittipat1413/go-common/framework/validator"
 )
 
-type CreateConcertInput struct {
-	Name  string    `json:"name" validate:"required,gt=0"`
-	Venue string    `json:"venue" validate:"required,gt=0"`
-	Date  time.Time `json:"date" validate:"required,thaitimezone"`
+type FindOneConcertInput struct {
+	ID string `json:"id" validate:"required,uuid4"`
 }
 
-func (u *concertUsecase) CreateConcert(ctx context.Context, input CreateConcertInput) (concert *entity.Concert, err error) {
-	const errLocation = "[usecase concert/create_concert CreateConcert] "
+func (u *concertUsecase) FindOneConcert(ctx context.Context, input FindOneConcertInput) (concert *entity.Concert, err error) {
+	const errLocation = "[usecase concert/find_one_concert FindOneConcert] "
 	defer errsFramework.WrapErrorWithPrefix(errLocation, &err)
 
 	return traceFramework.TraceFunc(ctx, traceFramework.GetTracer("concert.usecase"), func(ctx context.Context) (*entity.Concert, error) {
 		// Create a new validator instance
 		vInstance, err := validator.NewValidator(
 			validator.WithTagNameFunc(validator.JSONTagNameFunc),
-			validator.WithCustomValidator(new(customvalidator.ThaiTimezoneValidator)),
 		)
 		if err != nil {
 			return nil, errsFramework.WrapError(err, errsFramework.NewInternalServerError("failed to create validator", nil))
@@ -37,17 +34,20 @@ func (u *concertUsecase) CreateConcert(ctx context.Context, input CreateConcertI
 			return nil, errsFramework.WrapError(err, errsFramework.NewBadRequestError("the request is invalid", map[string]string{"details": err.Error()}))
 		}
 
-		concert := &entity.Concert{
-			Name:  input.Name,
-			Venue: input.Venue,
-			Date:  input.Date,
-		}
-
-		created, err := u.concertRepository.CreateOne(ctx, concert)
+		concertID, err := uuid.Parse(input.ID)
 		if err != nil {
-			return nil, errsFramework.WrapError(err, errsFramework.NewInternalServerError("failed to create concert", nil))
+			return nil, errsFramework.WrapError(err, errsFramework.NewBadRequestError("invalid concert ID", nil))
 		}
 
-		return created, nil
+		// Find concert by ID
+		concert, err := u.concertRepository.FindOne(ctx, concertID)
+		if err != nil {
+			var notFoundErr *errsFramework.NotFoundError
+			if !errors.As(err, &notFoundErr) { // If the error is not a NotFoundError, wrap it as an internal server error
+				return nil, errsFramework.WrapError(err, errsFramework.NewInternalServerError("failed to find concert by ID", nil))
+			}
+			return nil, err // Return the NotFoundError directly
+		}
+		return concert, nil
 	})
 }

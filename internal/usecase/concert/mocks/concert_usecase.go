@@ -50,3 +50,18 @@ func (mr *MockConcertUsecaseMockRecorder) CreateConcert(ctx, concert interface{}
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateConcert", reflect.TypeOf((*MockConcertUsecase)(nil).CreateConcert), ctx, concert)
 }
+
+// FindOneConcert mocks base method.
+func (m *MockConcertUsecase) FindOneConcert(ctx context.Context, id concert.FindOneConcertInput) (*entity.Concert, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindOneConcert", ctx, id)
+	ret0, _ := ret[0].(*entity.Concert)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindOneConcert indicates an expected call of FindOneConcert.
+func (mr *MockConcertUsecaseMockRecorder) FindOneConcert(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindOneConcert", reflect.TypeOf((*MockConcertUsecase)(nil).FindOneConcert), ctx, id)
+}
