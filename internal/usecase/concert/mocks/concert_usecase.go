@@ -52,10 +52,10 @@ func (mr *MockConcertUsecaseMockRecorder) CreateConcert(ctx, concert interface{}
 }
 
 // FindAllConcerts mocks base method.
-func (m *MockConcertUsecase) FindAllConcerts(ctx context.Context, input concert.FindAllConcertsInput) (*entity.Concerts, error) {
+func (m *MockConcertUsecase) FindAllConcerts(ctx context.Context, input concert.FindAllConcertsInput) (entity.Page[entity.Concert], error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindAllConcerts", ctx, input)
-	ret0, _ := ret[0].(*entity.Concerts)
+	ret0, _ := ret[0].(entity.Page[entity.Concert])
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

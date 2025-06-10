@@ -54,12 +54,13 @@ func (mr *MockConcertRepositoryMockRecorder) CreateOne(ctx, concert interface{})
 }
 
 // FindAll mocks base method.
-func (m *MockConcertRepository) FindAll(ctx context.Context, filter repository.FindAllConcertsFilter) (*entity.Concerts, error) {
+func (m *MockConcertRepository) FindAll(ctx context.Context, filter repository.FindAllConcertsFilter) (*entity.Concerts, int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindAll", ctx, filter)
 	ret0, _ := ret[0].(*entity.Concerts)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret1, _ := ret[1].(int64)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // FindAll indicates an expected call of FindAll.

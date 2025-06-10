@@ -1,5 +1,18 @@
 basePath: /
 definitions:
+  entity.Pagination:
+    properties:
+      current_page:
+        type: integer
+      limit:
+        type: integer
+      offset:
+        type: integer
+      page_count:
+        type: integer
+      total:
+        type: integer
+    type: object
   handler.createConcertRequest:
     properties:
       date:
@@ -83,6 +96,11 @@ definitions:
         example: Error message
         type: string
     type: object
+  httpresponse.PaginationMetadata:
+    properties:
+      pagination:
+        $ref: '#/definitions/entity.Pagination'
+    type: object
   httpresponse.SuccessResponse:
     properties:
       code:
@@ -116,11 +134,27 @@ paths:
         in: query
         name: venue
         type: string
+      - description: 'Number of results to return (default: 100)'
+        in: query
+        name: limit
+        type: integer
+      - description: 'Number of results to skip (default: 0)'
+        in: query
+        name: offset
+        type: integer
+      - description: 'Field to sort by (default: date) (options: date, name, venue)'
+        in: query
+        name: sortBy
+        type: string
+      - description: 'Sort order (default: asc) (options: asc, desc)'
+        in: query
+        name: sortOrder
+        type: string
       produces:
       - application/json
       responses:
         "200":
-          description: List of concerts
+          description: List of concerts with pagination details
           schema:
             allOf:
             - $ref: '#/definitions/httpresponse.SuccessResponse'
@@ -130,7 +164,7 @@ paths:
                     $ref: '#/definitions/handler.findAllConcertsResponse'
                   type: array
                 metadata:
-                  type: object
+                  $ref: '#/definitions/httpresponse.PaginationMetadata'
               type: object
         "400":
           description: Bad request
