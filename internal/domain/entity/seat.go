@@ -58,6 +58,10 @@ type Seat struct {
 	UpdatedAt         time.Time
 }
 
+func (s *Seat) IsBooked() bool {
+	return s.Status == SeatStatusBooked
+}
+
 func (s *Seat) IsLocked(now time.Time) bool {
 	return s.Status == SeatStatusPending && s.LockedUntil != nil && now.Before(*s.LockedUntil)
 }
@@ -65,3 +69,5 @@ func (s *Seat) IsLocked(now time.Time) bool {
 func (s *Seat) IsAvailable(now time.Time) bool {
 	return s.Status == SeatStatusAvailable || (s.Status == SeatStatusPending && s.LockedUntil != nil && now.After(*s.LockedUntil))
 }
+
+type Seats []Seat

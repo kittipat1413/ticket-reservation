@@ -18,6 +18,7 @@ package httproute
 import (
 	concertHandler "ticket-reservation/internal/api/http/handler/concert"
 	healthHandler "ticket-reservation/internal/api/http/handler/healthcheck"
+	seatHandler "ticket-reservation/internal/api/http/handler/seat"
 	"ticket-reservation/internal/api/http/middleware"
 	"ticket-reservation/internal/config"
 
@@ -33,12 +34,14 @@ type router struct {
 	Middleware         middleware.Middleware            // Middleware for handling requests
 	HealthCheckHandler healthHandler.HealthCheckHandler // Handler for health check routes
 	ConcertHandler     concertHandler.ConcertHandler    // Handler for concert routes
+	SeatHandler        seatHandler.SeatHandler          // Handler for seat routes
 }
 
 type Dependency struct {
 	Middleware         middleware.Middleware
 	HealthCheckHandler healthHandler.HealthCheckHandler
 	ConcertHandler     concertHandler.ConcertHandler
+	SeatHandler        seatHandler.SeatHandler
 }
 
 // NewHTTPRoutes creates a new instance of Router with the provided configuration and dependencies
@@ -48,6 +51,7 @@ func NewHTTPRoutes(cfg config.AppConfig, dep Dependency) Router {
 		Middleware:         dep.Middleware,
 		HealthCheckHandler: dep.HealthCheckHandler,
 		ConcertHandler:     dep.ConcertHandler,
+		SeatHandler:        dep.SeatHandler,
 	}
 }
 
@@ -55,6 +59,7 @@ func NewHTTPRoutes(cfg config.AppConfig, dep Dependency) Router {
 func (r *router) RegisterRoutes(router *gin.Engine) {
 	r.applyHealthCheckRoutes(router)
 	r.applyConcertRoutes(router)
+	r.applySeatReservationRoutes(router)
 }
 
 // applyHealthCheckRoutes applies the health check routes to the provided router
@@ -73,5 +78,13 @@ func (r *router) applyConcertRoutes(router *gin.Engine) {
 		concertRoute.GET("/", r.ConcertHandler.FindAllConcerts)
 		concertRoute.POST("/", r.ConcertHandler.CreateConcert)
 		concertRoute.GET("/:id", r.ConcertHandler.FindConcertByID)
+	}
+}
+
+// applySeatRoutes applies the seat reservation routes to the provided router
+func (r *router) applySeatReservationRoutes(router *gin.Engine) {
+	seatRoute := router.Group("/concerts/:id/zones/:zone_id/seats")
+	{
+		seatRoute.POST("/:seat_id/reserve", r.SeatHandler.ReserveSeat)
 	}
 }

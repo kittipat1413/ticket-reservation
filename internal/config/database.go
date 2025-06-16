@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"time"
 
 	cfgFramework "github.com/kittipat1413/go-common/framework/config"
@@ -16,22 +15,35 @@ type DatabaseConfig struct {
 	ConnMaxIdleTime time.Duration
 }
 
-func LoadDatabaseConfig(cfg *cfgFramework.Config) (*DatabaseConfig, error) {
-	lifetime, err := time.ParseDuration(cfg.GetString(DatabaseConnMaxLifetimeKey))
-	if err != nil {
-		return nil, fmt.Errorf("invalid DATABASE_CONN_MAX_LIFETIME: %w", err)
-	}
-
-	idleTime, err := time.ParseDuration(cfg.GetString(DatabaseConnMaxIdleTimeKey))
-	if err != nil {
-		return nil, fmt.Errorf("invalid DATABASE_CONN_MAX_IDLE_TIME: %w", err)
-	}
-
-	return &DatabaseConfig{
+func LoadDatabaseConfig(cfg *cfgFramework.Config) DatabaseConfig {
+	return DatabaseConfig{
 		URL:             cfg.GetString(DatabaseUrlKey),
 		MaxOpenConns:    cfg.GetInt(DatabaseMaxOpenConnsKey),
 		MaxIdleConns:    cfg.GetInt(DatabaseMaxIdleConnsKey),
-		ConnMaxLifetime: lifetime,
-		ConnMaxIdleTime: idleTime,
-	}, nil
+		ConnMaxLifetime: cfg.GetDuration(DatabaseConnMaxLifetimeKey),
+		ConnMaxIdleTime: cfg.GetDuration(DatabaseConnMaxIdleTimeKey),
+	}
+}
+
+// Redis configuration keys
+type RedisConfig struct {
+	Addrs        []string
+	Username     string
+	Password     string
+	DB           int
+	DialTimeout  time.Duration
+	ReadTimeout  time.Duration
+	WriteTimeout time.Duration
+}
+
+func LoadRedisConfig(cfg *cfgFramework.Config) RedisConfig {
+	return RedisConfig{
+		Addrs:        cfg.GetStringSlice(RedisAddrsKey),
+		Username:     cfg.GetString(RedisUsernameKey),
+		Password:     cfg.GetString(RedisPasswordKey),
+		DB:           cfg.GetInt(RedisDBKey),
+		DialTimeout:  cfg.GetDuration(RedisDialTimeoutKey),
+		ReadTimeout:  cfg.GetDuration(RedisReadTimeoutKey),
+		WriteTimeout: cfg.GetDuration(RedisWriteTimeoutKey),
+	}
 }

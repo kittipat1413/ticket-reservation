@@ -12,7 +12,7 @@ type ServiceCircuitBreakerError struct {
 func NewServiceCircuitBreakerError(data interface{}) error {
 	baseErr, err := errsFramework.NewBaseError(
 		StatusCodeServiceCircuitBreakerTripped,
-		"The service is currently unavailable. Please try again later.",
+		"the service is currently unavailable. please try again later.",
 		data,
 	)
 	if err != nil {

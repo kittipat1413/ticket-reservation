@@ -13,6 +13,26 @@ definitions:
       total:
         type: integer
     type: object
+  handler.ReserveSeatRequest:
+    properties:
+      session_id:
+        type: string
+    required:
+    - session_id
+    type: object
+  handler.ReserveSeatResponse:
+    properties:
+      expires_at:
+        type: string
+      reservation_id:
+        type: string
+      reserved_at:
+        type: string
+      seat_id:
+        type: string
+      status:
+        type: string
+    type: object
   handler.createConcertRequest:
     properties:
       date:
@@ -286,6 +306,77 @@ paths:
       summary: Find Concert by ID
       tags:
       - Concert
+  /concerts/{id}/zones/{zone_id}/seats/{seat_number}/reserve:
+    post:
+      consumes:
+      - application/json
+      description: Reserves a seat for a concert by locking it for the current session
+      parameters:
+      - description: Concert ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Zone ID
+        in: path
+        name: zone_id
+        required: true
+        type: string
+      - description: Seat Number
+        in: path
+        name: seat_number
+        required: true
+        type: string
+      - description: Reservation Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.ReserveSeatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Seat reserved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/httpresponse.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/handler.ReserveSeatResponse'
+                metadata:
+                  type: object
+              type: object
+        "400":
+          description: Bad Request - Invalid input
+          schema:
+            allOf:
+            - $ref: '#/definitions/httpresponse.ErrorResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "409":
+          description: Conflict - Seat already reserved
+          schema:
+            allOf:
+            - $ref: '#/definitions/httpresponse.ErrorResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error - Unexpected error occurred
+          schema:
+            allOf:
+            - $ref: '#/definitions/httpresponse.ErrorResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Reserve a Seat
+      tags:
+      - Seat
   /health/liveness:
     get:
       description: Check the liveness of the service

@@ -18,6 +18,7 @@ import (
 	"github.com/kittipat1413/go-common/util/pointer"
 
 	infraDB "ticket-reservation/internal/infra/db"
+	redis "ticket-reservation/internal/infra/redis"
 )
 
 type Server struct {
@@ -69,6 +70,9 @@ func (s *Server) Start() error {
 		return fmt.Errorf("failed to connect to database: %w", err)
 	}
 
+	// Initialize Redis client
+	redisClient := redis.NewClient(s.cfg)
+
 	// initialize gin
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
@@ -84,7 +88,7 @@ func (s *Server) Start() error {
 	})
 
 	// Setup route dependencies
-	deps, err := s.setupRouteDependencies(ctx, tracerProvider, appLogger, db)
+	deps, err := s.setupRouteDependencies(ctx, tracerProvider, appLogger, db, redisClient)
 	if err != nil {
 		return fmt.Errorf("failed to setup route dependencies: %w", err)
 	}
@@ -132,7 +136,10 @@ func (s *Server) Start() error {
 			"Database connection": func(ctx context.Context) error {
 				return db.Close()
 			},
-			// Other resources can be added here (e.g., Redis, etc.)
+			"Redis client": func(ctx context.Context) error {
+				return redisClient.Close()
+			},
+			// Other resources can be added here
 		},
 	)
 

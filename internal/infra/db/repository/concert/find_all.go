@@ -12,9 +12,8 @@ import (
 	"github.com/kittipat1413/go-common/util/pointer"
 )
 
-func (r *concertRepositoryImpl) FindAll(ctx context.Context, filter repository.FindAllConcertsFilter) (*entity.Concerts, int64, error) {
+func (r *concertRepositoryImpl) FindAll(ctx context.Context, filter repository.FindAllConcertsFilter) (concerts *entity.Concerts, total int64, err error) {
 	const errLocation = "[repository concert/find_all FindAll] "
-	var err error
 	defer errsFramework.WrapErrorWithPrefix(errLocation, &err)
 
 	// Build WHERE conditions for filtering
@@ -40,7 +39,6 @@ func (r *concertRepositoryImpl) FindAll(ctx context.Context, filter repository.F
 
 	countQuery, countArgs := countStmt.Sql()
 
-	var total int64
 	if err := r.execer.GetContext(ctx, &total, countQuery, countArgs...); err != nil {
 		return nil, 0, errsFramework.WrapError(err, errsFramework.NewDatabaseError("error while counting concerts", err.Error()))
 	}
@@ -94,6 +92,6 @@ func (r *concertRepositoryImpl) FindAll(ctx context.Context, filter repository.F
 		return nil, 0, errsFramework.WrapError(err, errsFramework.NewDatabaseError("error while querying concerts", err.Error()))
 	}
 
-	concerts := models.ToEntities()
+	concerts = models.ToEntities()
 	return concerts, total, nil
 }

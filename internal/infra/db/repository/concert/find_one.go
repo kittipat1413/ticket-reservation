@@ -36,5 +36,9 @@ func (r *concertRepositoryImpl) FindOne(ctx context.Context, id uuid.UUID) (conc
 	}
 
 	concert = model.ToEntity()
+	if concert == nil {
+		return nil, errsFramework.NewInternalServerError("failed to convert concert model to entity", nil)
+	}
+
 	return
 }

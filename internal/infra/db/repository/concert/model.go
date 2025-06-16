@@ -25,9 +25,13 @@ func (c *Concert) ToEntity() *entity.Concert {
 type Concerts []Concert
 
 func (cs Concerts) ToEntities() *entity.Concerts {
-	var entities entity.Concerts
+	concerts := make(entity.Concerts, 0, len(cs))
 	for _, c := range cs {
-		entities = append(entities, pointer.GetValue(c.ToEntity()))
+		concert := c.ToEntity()
+		if concert == nil {
+			continue
+		}
+		concerts = append(concerts, pointer.GetValue(concert))
 	}
-	return pointer.ToPointer(entities)
+	return pointer.ToPointer(concerts)
 }

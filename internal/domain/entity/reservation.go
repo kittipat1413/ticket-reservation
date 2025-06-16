@@ -57,6 +57,19 @@ type Reservation struct {
 	UpdatedAt  time.Time
 }
 
+func NewReservation(seatID uuid.UUID, sessionID string, expiresAt time.Time) *Reservation {
+	return &Reservation{
+		ID:         uuid.New(),
+		SeatID:     seatID,
+		SessionID:  sessionID,
+		Status:     ReservationStatusPending,
+		ReservedAt: time.Now(),
+		ExpiresAt:  expiresAt,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
+	}
+}
+
 func (r *Reservation) IsExpired(now time.Time) bool {
 	return r.Status == ReservationStatusPending && now.After(r.ExpiresAt)
 }
@@ -64,3 +77,5 @@ func (r *Reservation) IsExpired(now time.Time) bool {
 func (r *Reservation) CanPay(now time.Time) bool {
 	return r.Status == ReservationStatusPending && now.Before(r.ExpiresAt)
 }
+
+type Reservations []Reservation

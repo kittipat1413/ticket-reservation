@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 
 	cfgFramework "github.com/kittipat1413/go-common/framework/config"
@@ -11,6 +10,7 @@ type Config struct {
 	App     AppConfig            // Application-level settings such as API keys or feature flags
 	Service ServiceConfig        // Infrastructure-level service settings like name, port, and environment
 	DB      DatabaseConfig       // Database connection and pooling configuration
+	Redis   RedisConfig          // Redis connection configuration
 	Source  *cfgFramework.Config // Underlying unstructured config source, used for accessing unmapped keys
 }
 
@@ -28,15 +28,11 @@ func Configure() (*Config, error) {
 		cfgFramework.WithDefaults(configDefaults),
 	)
 
-	dbCfg, err := LoadDatabaseConfig(cfg)
-	if err != nil {
-		return nil, fmt.Errorf("invalid database config: %w", err)
-	}
-
 	return &Config{
 		App:     LoadAppConfig(cfg),
 		Service: LoadServiceConfig(cfg),
-		DB:      *dbCfg,
+		DB:      LoadDatabaseConfig(cfg),
+		Redis:   LoadRedisConfig(cfg),
 		Source:  cfg,
 	}, nil
 }

@@ -14,3 +14,5 @@ type Zone struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
+
+type Zones []Zone
