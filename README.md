@@ -29,37 +29,48 @@ ticket-reservation/
 │   ├── migrate_cmd.go            # Command to run database migrations
 │   ├── new_migration_cmd.go      # Command to create new migration files
 │   ├── print_config_cmd.go       # Command to print the current configuration
-│   ├── generate_sql_builder.go   # Command to generate SQL builder files
+│   └── generate_sql_builder.go   # Command to generate SQL builder files
 │   └── ...                       # Other commands
 ├── db/                           # Database-related files
-│   ├── migrations/               # Database migration files
-│   │   ├── 202504221350_init.up.sql
-│   │   ├── 202504221350_init.down.sql
-│   │   └── ...
-|── docs/                         # Documentation files
-│   └── swagger.yaml              # API documentation in Swagger format
+│   └── migrations/               # Database migration files
+├── docs/                         # Documentation files
+│   ├── swagger.yaml              # API documentation in Swagger format
+│   └── ...                       # Other design and architecture documents
 ├── internal/                     # Internal application code
-│   ├── api/                      # Delivery layer (HTTP handlers, routes, middleware)
-│   │   ├── http/
-│   │   │   ├── handler/          # HTTP handlers
-│   │   │   │   ├── healthcheck/  # Health check handlers
-│   │   │   │   └── ...
-│   │   │   ├── middleware/       # HTTP middleware
-│   │   │   └── route/            # HTTP route definitions
-│   ├── config/                   # Configuration structs and loaders
-│   ├── domain/                   # Domain entities and interfaces
+│   ├── api/                      # Delivery layer
+│   │   └── http/                 # HTTP API components
+│   │       ├── handler/          # HTTP handlers by domain
+│   │       │   ├── healthcheck/  # Health check handlers
+│   │       │   └── ...           # Other domain handlers
+│   │       ├── middleware/       # HTTP middleware
+│   │       └── route/            # HTTP route definitions
+│   ├── config/                   # Application configuration
+│   ├── domain/                   # Domain layer
+│   │   ├── cache/                # Cache-related interfaces
 │   │   ├── entity/               # Domain models (e.g., Concert, Reservation)
-│   │   ├── repository/           # Repository interfaces
-│   │   │   └── mocks/            # Mock implementations for repositories
-│   ├── infra/                    # Infrastructure implementations
-│   │   ├── db/                   # Database logic
+│   │   ├── errs/                 # Domain-specific errors
+│   │   └── repository/           # Repository interfaces
+│   ├── infra/                    # Infrastructure layer
+│   │   ├── db/                   # Database implementations
 │   │   │   ├── connection.go     # Database connection setup
-│   │   │   ├── transactor.go     # Database transactor
-│   │   │   ├── sql_execer.go     # Interface for executing SQL queries
-│   │   │   ├── model_gen/        # Generated database models and table definitions
-│   │   │   ├── healthcheck/      # Health check repository implementation
-│   │   │   └── ...               # Other repository implementation
+│   │   │   ├── sql_execer.go     # SQL execution interface
+│   │   │   ├── transactor.go     # Transaction management
+│   │   │   ├── mocks/            # Mock implementations
+│   │   │   ├── model_gen/        # Generated models from DB schema
+│   │   │   └── repository/       # Repository implementations
+│   │   │       ├── healthcheck/  # Health check repository
+│   │   │       └── ...           # Other repositories
+│   │   └── redis/                # Redis implementations
+│   │       ├── client.go         # Redis client interface
+│   │       ├── connection.go     # Redis connection setup
+│   │       ├── mocks/            # Mock implementations
+│   │       └── repository/       # Repository implementations
+│   │           ├── seat/         # Seat locking and cache implementations
+│   │           └── ...           # Other repositories
 │   ├── server/                   # Server setup and initialization
+│   │   ├── dependency.go         # Dependency injection
+│   │   ├── middleware.go         # Server middleware
+│   │   └── server.go             # HTTP server setup
 │   ├── usecase/                  # Application business logic
 │   │   ├── healthcheck/          # Health check use case
 │   │   └── ...                   # Other use cases
@@ -67,11 +78,14 @@ ticket-reservation/
 │       ├── httpresponse/         # HTTP response helpers
 │       └── ...                   # Other utility functions
 ├── pkg/                          # Shared helper packages
-├── env.yaml                      # Environment variables configuration (for local dev)
+├── docker-compose.yaml           # Docker Compose for local development
+├── Dockerfile                    # Docker build definition
+├── env.yaml                      # Environment variables configuration
 ├── go.mod                        # Go module definition
 ├── go.sum                        # Go module dependencies
 ├── main.go                       # Main application entry point
 ├── Makefile                      # Makefile for common tasks
+├── otel-collector-config.yaml    # OpenTelemetry collector configuration
 └── README.md                     # Project documentation
 ```
 
@@ -105,6 +119,24 @@ You can start the server with the CLI command provided:
 go run main.go serve
 ```
 
+## 🧪 Testing Strategy
+
+The project follows a comprehensive testing strategy focusing on testability through interfaces:
+
+- **Interface-Driven Design:** All major components are defined through interfaces, allowing easy mock substitution for testing
+- **Mock Implementations:** Mock implementations are provided for all interfaces in the `mocks/` directories throughout the codebase
+- **Unit Tests:** Unit tests are implemented for key business logic, particularly in the usecase layer
+- **Test Examples:** See `internal/usecase/seat/seat_usecase_test.go` for an example of how to use mocks to test the seat reservation flow
+
+To run the tests:
+```bash
+# Run all tests
+go test ./...
+
+# Run tests for a specific package
+go test ./internal/usecase/seat/...
+```
+
 ## 🛠️ Available Commands
 
 The project leverages a CLI powered by Cobra with the following key commands:
@@ -127,13 +159,13 @@ The generated Swagger documentation (see [`/docs/swagger.yaml`](./docs/swagger.y
 
 ## ⚙️ Makefile Overview
 
-Here’s a brief overview of the key targets in the provided Makefile:
+Here's a brief overview of the key targets in the provided Makefile:
 - `install`: Installs all required Go tools (swag, mockgen, etc.).
 - `gen-swag`: Generates Swagger documentation from code annotations.
 - `gen-db`: Generates database models using go-jet.
 - `gen-mock`: Generates mock files from code annotations.
-- `lint`: Runs Go’s linter to check for code quality issues.
-- `vet`: Runs Go’s vet tool for static analysis.
+- `lint`: Runs Go's linter to check for code quality issues.
+- `vet`: Runs Go's vet tool for static analysis.
 - `fmt`: Formats the Go codebase.
 
 ## 🚀 Getting Started
