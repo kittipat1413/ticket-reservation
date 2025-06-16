@@ -165,12 +165,8 @@ func (u *seatUsecase) ReserveSeat(ctx context.Context, input ReserveSeatInput) (
 			LockedUntil:       pointer.ToPointer(requestTime.Add(u.appConfig.SeatLockTTL)),
 		})
 		if err != nil {
-			var notFoundErr *errsFramework.NotFoundError
-			if !errors.As(err, &notFoundErr) { // If the error is not a NotFoundError, wrap it as an internal server error
-				err = errsFramework.WrapError(err, errsFramework.NewInternalServerError("failed to update seat", nil))
-				return nil, err
-			}
-			return nil, err // Return the NotFoundError directly
+			err = errsFramework.WrapError(err, errsFramework.NewInternalServerError("failed to update seat status", nil))
+			return nil, err
 		}
 
 		var (
