@@ -16,8 +16,8 @@ type AppConfig struct {
 
 func LoadAppConfig(cfg *cfgFramework.Config) AppConfig {
 	return AppConfig{
-		AdminAPIKey:    cfg.GetString(AdminApiKey),
-		AdminAPISecret: cfg.GetString(AdminApiSecret),
+		AdminAPIKey:    cfg.GetString(AdminAPIKey),
+		AdminAPISecret: cfg.GetString(AdminAPISecret),
 		Timezone:       cfg.GetString(AppTimezoneKey),
 		SeatLockTTL:    cfg.GetDuration(SeatLockTTLKey),
 	}

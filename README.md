@@ -137,7 +137,7 @@ go test ./...
 go test ./internal/usecase/seat/...
 ```
 
-## 🛠️ Available Commands
+## 🛠️ Available Cobra Commands
 
 The project leverages a CLI powered by Cobra with the following key commands:
 - `serve`: Start the application server.
@@ -158,15 +158,25 @@ The architectural decisions, design patterns, and system diagrams are documented
 The generated Swagger documentation (see [`/docs/swagger.yaml`](./docs/swagger.yaml)) provides a detailed API specification, including endpoints, request/response schemas, and usage examples.
 
 ## ⚙️ Makefile Overview
-
-Here's a brief overview of the key targets in the provided Makefile:
-- `install`: Installs all required Go tools (swag, mockgen, etc.).
-- `gen-swag`: Generates Swagger documentation from code annotations.
-- `gen-db`: Generates database models using go-jet.
-- `gen-mock`: Generates mock files from code annotations.
-- `lint`: Runs Go's linter to check for code quality issues.
-- `vet`: Runs Go's vet tool for static analysis.
-- `fmt`: Formats the Go codebase.
+The project includes a `Makefile` to simplify common tasks and commands. Here are the available targets:
+```
+Available commands ⚙️
+  make install                  - Install necessary Go tools for the project
+  make gen-all                  - Generate all necessary files (Swagger, DB models, mocks)
+  make gen-swag                 - Generate Swagger documentation
+  make gen-db                   - Generate database models
+  make gen-mock                 - Generate mock files
+  make precommit                - Run linters, go vet, and go fmt
+  make lint                     - Run linters
+  make vet                      - Run go vet
+  make fmt                      - Format Go code
+  make test                     - Run tests
+  make test-coverage            - Run tests with coverage and generate a coverage report
+  make open-coverage-report     - Open the coverage report in a web browser
+  make new-migration            - Create a new migration file
+  make migrate-up               - Apply all pending migrations
+  make migrate-down             - Roll back the last migration
+```
 
 ## 🚀 Getting Started
 ### ⚡ Quick Start

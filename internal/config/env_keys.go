@@ -7,15 +7,15 @@ const (
 	ServiceEnvKey       = "SERVICE_ENV"
 	ServiceErrPrefixKey = "SERVICE_ERR_PREFIX"
 	OtelExporterKey     = "OTEL_COLLECTOR_ENDPOINT"
-	AdminApiKey         = "ADMIN_API_KEY"    // #nosec G101
-	AdminApiSecret      = "ADMIN_API_SECRET" // #nosec G101
+	AdminAPIKey         = "ADMIN_API_KEY"    // #nosec G101
+	AdminAPISecret      = "ADMIN_API_SECRET" // #nosec G101
 	AppTimezoneKey      = "APP_TIMEZONE"
 	SeatLockTTLKey      = "SEAT_LOCK_TTL"
 )
 
 // Database configuration environment variable keys
 const (
-	DatabaseUrlKey             = "DATABASE_URL"
+	DatabaseURLKey             = "DATABASE_URL"
 	DatabaseMaxOpenConnsKey    = "DATABASE_MAX_OPEN_CONNS"
 	DatabaseMaxIdleConnsKey    = "DATABASE_MAX_IDLE_CONNS"
 	DatabaseConnMaxLifetimeKey = "DATABASE_CONN_MAX_LIFETIME"  // duration string like "30m"
@@ -40,7 +40,7 @@ var configDefaults = map[string]any{
 	ServiceErrPrefixKey: "TR",
 	SeatLockTTLKey:      "300s",
 	// Database configuration
-	DatabaseUrlKey:             "postgres://postgres:mypass@localhost:5432/ticket-reservation?sslmode=disable",
+	DatabaseURLKey:             "postgres://postgres:mypass@localhost:5432/ticket-reservation?sslmode=disable",
 	DatabaseMaxOpenConnsKey:    30,
 	DatabaseMaxIdleConnsKey:    15,
 	DatabaseConnMaxLifetimeKey: "30m",

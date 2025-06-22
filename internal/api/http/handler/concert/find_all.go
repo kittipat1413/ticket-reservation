@@ -2,7 +2,7 @@ package handler
 
 import (
 	"ticket-reservation/internal/domain/entity"
-	"ticket-reservation/internal/usecase/concert"
+	concertUsecase "ticket-reservation/internal/usecase/concert"
 	"ticket-reservation/internal/util/httpresponse"
 	"time"
 
@@ -72,7 +72,7 @@ func (h *concertHandler) FindAllConcerts(c *gin.Context) {
 		}
 	}
 
-	concerts, err := h.concertUsecase.FindAllConcerts(c.Request.Context(), concert.FindAllConcertsInput{
+	concerts, err := h.concertUsecase.FindAllConcerts(c.Request.Context(), concertUsecase.FindAllConcertsInput{
 		StartDate: query.StartDate,
 		EndDate:   query.EndDate,
 		Venue:     query.Venue,

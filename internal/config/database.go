@@ -17,7 +17,7 @@ type DatabaseConfig struct {
 
 func LoadDatabaseConfig(cfg *cfgFramework.Config) DatabaseConfig {
 	return DatabaseConfig{
-		URL:             cfg.GetString(DatabaseUrlKey),
+		URL:             cfg.GetString(DatabaseURLKey),
 		MaxOpenConns:    cfg.GetInt(DatabaseMaxOpenConnsKey),
 		MaxIdleConns:    cfg.GetInt(DatabaseMaxIdleConnsKey),
 		ConnMaxLifetime: cfg.GetDuration(DatabaseConnMaxLifetimeKey),

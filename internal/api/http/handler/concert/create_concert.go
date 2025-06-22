@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 	"ticket-reservation/internal/domain/entity"
-	"ticket-reservation/internal/usecase/concert"
+	concertUsecase "ticket-reservation/internal/usecase/concert"
 	"ticket-reservation/internal/util/httpresponse"
 	"time"
 
@@ -42,7 +42,7 @@ func (h *concertHandler) CreateConcert(c *gin.Context) {
 		return
 	}
 
-	createdConcert, err := h.concertUsecase.CreateConcert(c.Request.Context(), concert.CreateConcertInput{
+	createdConcert, err := h.concertUsecase.CreateConcert(c.Request.Context(), concertUsecase.CreateConcertInput{
 		Name:  input.Name,
 		Venue: input.Venue,
 		Date:  input.Date,

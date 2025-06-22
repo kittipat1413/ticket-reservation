@@ -50,11 +50,11 @@ func runGenerateSQLBuilderCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func generateSQLBuilder(databaseUrl string, schema string, dir string) error {
+func generateSQLBuilder(databaseURL string, schema string, dir string) error {
 	// Generate SQL builder files using go-jet
 	// documentation: https://github.com/go-jet/jet/wiki/Generator
 	err := postgres.GenerateDSN(
-		databaseUrl, // database connection
+		databaseURL, // database connection
 		schema,      // schema name
 		dir,         // output directory
 		template.Default(jetPostgres.Dialect).

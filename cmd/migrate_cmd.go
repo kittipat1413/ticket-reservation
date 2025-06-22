@@ -60,13 +60,13 @@ func runMigrateCmd(cmd *cobra.Command, args []string) error {
 		if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 			return fmt.Errorf("failed to run up migration: %w", err)
 		}
-		log.Println("Migrations applied successfully.")
+		log.Println("All migrations applied successfully.")
 	case "down":
 		log.Println("Running migration: DOWN")
-		if err := m.Down(); err != nil {
+		if err := m.Steps(-1); err != nil {
 			return fmt.Errorf("failed to run down migration: %w", err)
 		}
-		log.Println("All migrations rolled back.")
+		log.Println("Rolled back one migration successfully.")
 	default:
 		return fmt.Errorf("invalid action: %s (use up or down)", action)
 	}

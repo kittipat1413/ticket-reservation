@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 	entity "ticket-reservation/internal/domain/entity"
-	concert "ticket-reservation/internal/usecase/concert"
+	usecase "ticket-reservation/internal/usecase/concert"
 
 	gomock "github.com/golang/mock/gomock"
 )
@@ -37,7 +37,7 @@ func (m *MockConcertUsecase) EXPECT() *MockConcertUsecaseMockRecorder {
 }
 
 // CreateConcert mocks base method.
-func (m *MockConcertUsecase) CreateConcert(ctx context.Context, concert concert.CreateConcertInput) (*entity.Concert, error) {
+func (m *MockConcertUsecase) CreateConcert(ctx context.Context, concert usecase.CreateConcertInput) (*entity.Concert, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateConcert", ctx, concert)
 	ret0, _ := ret[0].(*entity.Concert)
@@ -52,7 +52,7 @@ func (mr *MockConcertUsecaseMockRecorder) CreateConcert(ctx, concert interface{}
 }
 
 // FindAllConcerts mocks base method.
-func (m *MockConcertUsecase) FindAllConcerts(ctx context.Context, input concert.FindAllConcertsInput) (entity.Page[entity.Concert], error) {
+func (m *MockConcertUsecase) FindAllConcerts(ctx context.Context, input usecase.FindAllConcertsInput) (entity.Page[entity.Concert], error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindAllConcerts", ctx, input)
 	ret0, _ := ret[0].(entity.Page[entity.Concert])
@@ -67,7 +67,7 @@ func (mr *MockConcertUsecaseMockRecorder) FindAllConcerts(ctx, input interface{}
 }
 
 // FindOneConcert mocks base method.
-func (m *MockConcertUsecase) FindOneConcert(ctx context.Context, id concert.FindOneConcertInput) (*entity.Concert, error) {
+func (m *MockConcertUsecase) FindOneConcert(ctx context.Context, id usecase.FindOneConcertInput) (*entity.Concert, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindOneConcert", ctx, id)
 	ret0, _ := ret[0].(*entity.Concert)

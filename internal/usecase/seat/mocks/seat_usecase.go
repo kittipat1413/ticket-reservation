@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 	entity "ticket-reservation/internal/domain/entity"
-	seat "ticket-reservation/internal/usecase/seat"
+	usecase "ticket-reservation/internal/usecase/seat"
 
 	gomock "github.com/golang/mock/gomock"
 )
@@ -37,7 +37,7 @@ func (m *MockSeatUsecase) EXPECT() *MockSeatUsecaseMockRecorder {
 }
 
 // ReserveSeat mocks base method.
-func (m *MockSeatUsecase) ReserveSeat(ctx context.Context, input seat.ReserveSeatInput) (*entity.Reservation, error) {
+func (m *MockSeatUsecase) ReserveSeat(ctx context.Context, input usecase.ReserveSeatInput) (*entity.Reservation, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ReserveSeat", ctx, input)
 	ret0, _ := ret[0].(*entity.Reservation)

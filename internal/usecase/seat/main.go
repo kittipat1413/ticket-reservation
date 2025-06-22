@@ -1,4 +1,4 @@
-package seat
+package usecase
 
 import (
 	"context"
