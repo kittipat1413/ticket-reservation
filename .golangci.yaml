@@ -50,4 +50,3 @@ run:
   relative-path-mode: gomod # The paths will be relative to the directory of the `go.mod` file.
   allow-parallel-runners: true # Allow multiple parallel golangci-lint instances running.
   allow-serial-runners: true # Allow multiple golangci-lint instances running, but serialize them around a lock.
-  concurrency: 4 # Number of parallel linters to run.
