@@ -2,11 +2,12 @@ package repository
 
 import (
 	"context"
-	"ticket-reservation/internal/domain/entity"
-	"ticket-reservation/internal/infra/db"
 	"time"
 
 	"github.com/google/uuid"
+
+	"ticket-reservation/internal/domain/entity"
+	"ticket-reservation/internal/infra/db"
 )
 
 //go:generate mockgen -source=./concert_repository.go -destination=./mocks/concert_repository.go -package=repository_mocks

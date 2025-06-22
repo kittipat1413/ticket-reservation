@@ -3,11 +3,12 @@ package middleware
 import (
 	"crypto/sha256"
 	"crypto/subtle"
+
+	"github.com/gin-gonic/gin"
+
 	"ticket-reservation/internal/util/httpresponse"
 
 	errsFramework "github.com/kittipat1413/go-common/framework/errors"
-
-	"github.com/gin-gonic/gin"
 )
 
 func (m *middleware) BasicAuth(username, password string) gin.HandlerFunc {

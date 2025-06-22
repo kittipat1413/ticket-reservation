@@ -13,8 +13,8 @@ type seatLocker struct {
 	lockmanager lockmanager.LockManager
 }
 
-func NewSeatLocker(lockmanager lockmanager.LockManager) domaincache.SeatLocker {
-	return &seatLocker{lockmanager: lockmanager}
+func NewSeatLocker(lm lockmanager.LockManager) domaincache.SeatLocker {
+	return &seatLocker{lockmanager: lm}
 }
 
 func (s *seatLocker) LockSeat(ctx context.Context, concertID, zoneID, seatID, token string, ttl time.Duration) error {
