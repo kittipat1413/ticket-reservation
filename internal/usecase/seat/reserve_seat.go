@@ -158,7 +158,7 @@ func (u *seatUsecase) ReserveSeat(ctx context.Context, input ReserveSeatInput) (
 		}
 
 		// Update seat status in database
-		_, err = u.seatRepository.WithTx(tx.DB()).UpdateOne(ctx, repository.UpdateSeatInput{
+		seat, err = u.seatRepository.WithTx(tx.DB()).UpdateOne(ctx, repository.UpdateSeatInput{
 			ID:                seat.ID,
 			Status:            pointer.ToPointer(entity.SeatStatusPending),
 			LockedBySessionID: pointer.ToPointer(input.SessionID),
