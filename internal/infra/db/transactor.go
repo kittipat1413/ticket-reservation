@@ -7,6 +7,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+//go:generate mockgen -source=./transactor.go -destination=./mocks/transactor_mock.go -package=db_mocks
 type Transactor interface {
 	Commit() error
 	Rollback() error
