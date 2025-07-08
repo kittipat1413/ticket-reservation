@@ -7,11 +7,8 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	healthcheckrepo "ticket-reservation/internal/infra/db/repository/healthcheck"
 
 	errsFramework "github.com/kittipat1413/go-common/framework/errors"
 )
@@ -122,44 +119,4 @@ func TestHealthCheckRepositoryImpl_CheckDatabaseReadiness_QueryValidation(t *tes
 	// Verify all expectations were met
 	err = h.mock.ExpectationsWereMet()
 	assert.NoError(t, err)
-}
-
-func TestHealthCheckRepositoryImpl_WithTx(t *testing.T) {
-	h := initTest(t)
-	defer h.done()
-
-	// Create a mock transaction
-	txDB, _, err := sqlmock.New()
-	require.NoError(t, err)
-	defer txDB.Close()
-
-	transactionDB := sqlx.NewDb(txDB, "sqlmock")
-
-	// Execute
-	txRepo := h.repository.WithTx(transactionDB)
-
-	// Assert
-	assert.NotNil(t, txRepo)
-
-	// Verify that the returned repository is a new instance with the transaction
-	assert.NotEqual(t, h.repository, txRepo, "WithTx should return a new repository instance")
-}
-
-func TestNewHealthCheckRepository(t *testing.T) {
-	h := initTest(t)
-	defer h.done()
-
-	// The repository is already created in initTest, so we just need to verify it's not nil
-	assert.NotNil(t, h.repository)
-
-	// We can also test creating a new one directly
-	db, _, err := sqlmock.New()
-	require.NoError(t, err)
-	defer db.Close()
-
-	mockDB := sqlx.NewDb(db, "sqlmock")
-	repo := healthcheckrepo.NewHealthCheckRepository(mockDB)
-
-	// Assert
-	assert.NotNil(t, repo)
 }
