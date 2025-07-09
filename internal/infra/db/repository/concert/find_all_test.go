@@ -214,10 +214,10 @@ func TestConcertRepositoryImpl_FindAll(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := initTest(t)
-			defer h.done()
+			defer h.Done()
 
-			tt.setupMock(h.mock, tt.filter)
-			concerts, total, err := h.repository.FindAll(context.Background(), tt.filter)
+			tt.setupMock(h.Mock, tt.filter)
+			concerts, total, err := h.Repository.FindAll(context.Background(), tt.filter)
 
 			// Assert
 			if tt.expectedError {
@@ -252,8 +252,7 @@ func TestConcertRepositoryImpl_FindAll(t *testing.T) {
 			}
 
 			// Verify all expectations were met
-			err = h.mock.ExpectationsWereMet()
-			assert.NoError(t, err)
+			h.AssertExpectationsMet(t)
 		})
 	}
 }
@@ -311,7 +310,7 @@ func TestConcertRepositoryImpl_FindAll_SortingOptions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := initTest(t)
-			defer h.done()
+			defer h.Done()
 
 			filter := repository.FindAllConcertsFilter{
 				SortBy:    &tt.sortBy,
@@ -320,7 +319,7 @@ func TestConcertRepositoryImpl_FindAll_SortingOptions(t *testing.T) {
 
 			// Count query
 			countRows := sqlmock.NewRows([]string{"total"}).AddRow(1)
-			h.mock.ExpectQuery(`SELECT COUNT\(concerts\.id\) AS "total" FROM public\.concerts`).
+			h.Mock.ExpectQuery(`SELECT COUNT\(concerts\.id\) AS "total" FROM public\.concerts`).
 				WillReturnRows(countRows)
 
 			// Main query with specific ORDER BY
@@ -330,15 +329,14 @@ func TestConcertRepositoryImpl_FindAll_SortingOptions(t *testing.T) {
 			}).AddRow(testID, "Test Concert", testDate, "Test Venue", createdAt, updatedAt)
 
 			expectedQuery := `SELECT concerts\.id AS "concerts\.id", concerts\.name AS "concerts\.name", concerts\.date AS "concerts\.date", concerts\.venue AS "concerts\.venue", concerts\.created_at AS "concerts\.created_at", concerts\.updated_at AS "concerts\.updated_at" FROM public\.concerts ` + tt.expectedOrderBy
-			h.mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+			h.Mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
 
-			_, _, err := h.repository.FindAll(context.Background(), filter)
+			_, _, err := h.Repository.FindAll(context.Background(), filter)
 
 			require.NoError(t, err)
 
 			// Verify all expectations were met
-			err = h.mock.ExpectationsWereMet()
-			assert.NoError(t, err)
+			h.AssertExpectationsMet(t)
 		})
 	}
 }

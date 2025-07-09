@@ -110,10 +110,10 @@ func TestConcertRepositoryImpl_FindOne(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := initTest(t)
-			defer h.done()
+			defer h.Done()
 
-			tt.setupMock(h.mock, tt.concertID)
-			concert, err := h.repository.FindOne(context.Background(), tt.concertID)
+			tt.setupMock(h.Mock, tt.concertID)
+			concert, err := h.Repository.FindOne(context.Background(), tt.concertID)
 
 			// Assert
 			if tt.expectedError {
@@ -142,15 +142,14 @@ func TestConcertRepositoryImpl_FindOne(t *testing.T) {
 			}
 
 			// Verify all expectations were met
-			err = h.mock.ExpectationsWereMet()
-			assert.NoError(t, err)
+			h.AssertExpectationsMet(t)
 		})
 	}
 }
 
 func TestConcertRepositoryImpl_FindOne_QueryValidation(t *testing.T) {
 	h := initTest(t)
-	defer h.done()
+	defer h.Done()
 
 	testID := uuid.New()
 	testTime := time.Date(2025, 12, 25, 20, 0, 0, 0, time.UTC)
@@ -169,14 +168,14 @@ func TestConcertRepositoryImpl_FindOne_QueryValidation(t *testing.T) {
 	// The query should include all columns and proper WHERE clause
 	expectedQuery := `SELECT concerts\.id AS "concerts\.id", concerts\.name AS "concerts\.name", concerts\.date AS "concerts\.date", concerts\.venue AS "concerts\.venue", concerts\.created_at AS "concerts\.created_at", concerts\.updated_at AS "concerts\.updated_at" FROM public\.concerts WHERE concerts\.id = \$1`
 
-	h.mock.ExpectQuery(expectedQuery).
+	h.Mock.ExpectQuery(expectedQuery).
 		WithArgs(testID).
 		WillReturnRows(rows)
 
 	ctx := context.Background()
 
 	// Execute
-	concert, err := h.repository.FindOne(ctx, testID)
+	concert, err := h.Repository.FindOne(ctx, testID)
 
 	// Assert
 	require.NoError(t, err)
@@ -186,6 +185,5 @@ func TestConcertRepositoryImpl_FindOne_QueryValidation(t *testing.T) {
 	assert.Equal(t, "Test Venue", concert.Venue)
 
 	// Verify all expectations were met
-	err = h.mock.ExpectationsWereMet()
-	assert.NoError(t, err)
+	h.AssertExpectationsMet(t)
 }

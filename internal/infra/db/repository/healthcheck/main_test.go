@@ -2,13 +2,21 @@ package healthcheckrepo_test
 
 import (
 	"testing"
+	"ticket-reservation/internal/domain/repository"
 	healthcheckrepo "ticket-reservation/internal/infra/db/repository/healthcheck"
+	"ticket-reservation/pkg/testhelper"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func initTest(t *testing.T) *testhelper.RepoTestHelper[repository.HealthCheckRepository] {
+	return testhelper.InitRepoTest(t, func(db *sqlx.DB) repository.HealthCheckRepository {
+		return healthcheckrepo.NewHealthCheckRepository(db)
+	})
+}
 
 func TestNewHealthCheckRepository(t *testing.T) {
 	db, _, err := sqlmock.New()
@@ -26,7 +34,7 @@ func TestNewHealthCheckRepository(t *testing.T) {
 
 func TestHealthCheckRepositoryImpl_WithTx(t *testing.T) {
 	h := initTest(t)
-	defer h.done()
+	defer h.Done()
 
 	// Create a mock transaction
 	txDB, _, err := sqlmock.New()
@@ -36,11 +44,11 @@ func TestHealthCheckRepositoryImpl_WithTx(t *testing.T) {
 	transactionDB := sqlx.NewDb(txDB, "sqlmock")
 
 	// Execute
-	txRepo := h.repository.WithTx(transactionDB)
+	txRepo := h.Repository.WithTx(transactionDB)
 
 	// Assert
 	assert.NotNil(t, txRepo)
 
 	// Verify that the returned repository is a new instance with the transaction
-	assert.NotEqual(t, h.repository, txRepo, "WithTx should return a new repository instance")
+	assert.NotEqual(t, h.Repository, txRepo, "WithTx should return a new repository instance")
 }

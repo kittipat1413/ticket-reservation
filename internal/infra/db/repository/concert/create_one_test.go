@@ -144,10 +144,10 @@ func TestConcertRepositoryImpl_CreateOne(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := initTest(t)
-			defer h.done()
+			defer h.Done()
 
-			tt.setupMock(h.mock, tt.input)
-			concert, err := h.repository.CreateOne(context.Background(), tt.input)
+			tt.setupMock(h.Mock, tt.input)
+			concert, err := h.Repository.CreateOne(context.Background(), tt.input)
 
 			// Assert
 			if tt.expectedError {
@@ -176,15 +176,14 @@ func TestConcertRepositoryImpl_CreateOne(t *testing.T) {
 			}
 
 			// Verify all expectations were met
-			err = h.mock.ExpectationsWereMet()
-			assert.NoError(t, err)
+			h.AssertExpectationsMet(t)
 		})
 	}
 }
 
 func TestConcertRepositoryImpl_CreateOne_QueryValidation(t *testing.T) {
 	h := initTest(t)
-	defer h.done()
+	defer h.Done()
 
 	testDate := time.Date(2025, 12, 25, 20, 0, 0, 0, time.UTC)
 	createdAt := time.Date(2025, 1, 1, 10, 0, 0, 0, time.UTC)
@@ -209,14 +208,14 @@ func TestConcertRepositoryImpl_CreateOne_QueryValidation(t *testing.T) {
 	// The query should be an INSERT with RETURNING clause
 	expectedQuery := `INSERT INTO public\.concerts \(name, date, venue\) VALUES \(\$1, \$2, \$3\) RETURNING concerts\.id AS "concerts\.id", concerts\.name AS "concerts\.name", concerts\.date AS "concerts\.date", concerts\.venue AS "concerts\.venue", concerts\.created_at AS "concerts\.created_at", concerts\.updated_at AS "concerts\.updated_at"`
 
-	h.mock.ExpectQuery(expectedQuery).
+	h.Mock.ExpectQuery(expectedQuery).
 		WithArgs(input.Name, input.Date, input.Venue).
 		WillReturnRows(rows)
 
 	ctx := context.Background()
 
 	// Execute
-	concert, err := h.repository.CreateOne(ctx, input)
+	concert, err := h.Repository.CreateOne(ctx, input)
 
 	// Assert
 	require.NoError(t, err)
@@ -226,6 +225,5 @@ func TestConcertRepositoryImpl_CreateOne_QueryValidation(t *testing.T) {
 	assert.Equal(t, "Test Venue", concert.Venue)
 
 	// Verify all expectations were met
-	err = h.mock.ExpectationsWereMet()
-	assert.NoError(t, err)
+	h.AssertExpectationsMet(t)
 }

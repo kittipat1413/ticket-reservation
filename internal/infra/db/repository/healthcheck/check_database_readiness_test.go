@@ -71,10 +71,10 @@ func TestHealthCheckRepositoryImpl_CheckDatabaseReadiness(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := initTest(t)
-			defer h.done()
+			defer h.Done()
 
-			tt.setupMock(h.mock)
-			ok, err := h.repository.CheckDatabaseReadiness(context.Background())
+			tt.setupMock(h.Mock)
+			ok, err := h.Repository.CheckDatabaseReadiness(context.Background())
 
 			// Assert
 			assert.Equal(t, tt.expectedOk, ok)
@@ -93,30 +93,28 @@ func TestHealthCheckRepositoryImpl_CheckDatabaseReadiness(t *testing.T) {
 			}
 
 			// Verify all expectations were met
-			err = h.mock.ExpectationsWereMet()
-			assert.NoError(t, err)
+			h.AssertExpectationsMet(t)
 		})
 	}
 }
 
 func TestHealthCheckRepositoryImpl_CheckDatabaseReadiness_QueryValidation(t *testing.T) {
 	h := initTest(t)
-	defer h.done()
+	defer h.Done()
 
 	// Setup expectations - verify exact query
 	rows := sqlmock.NewRows([]string{"?column?"}).AddRow(true)
-	h.mock.ExpectQuery("SELECT 1=1").WillReturnRows(rows)
+	h.Mock.ExpectQuery("SELECT 1=1").WillReturnRows(rows)
 
 	ctx := context.Background()
 
 	// Execute
-	ok, err := h.repository.CheckDatabaseReadiness(ctx)
+	ok, err := h.Repository.CheckDatabaseReadiness(ctx)
 
 	// Assert
 	require.NoError(t, err)
 	assert.True(t, ok)
 
 	// Verify all expectations were met
-	err = h.mock.ExpectationsWereMet()
-	assert.NoError(t, err)
+	h.AssertExpectationsMet(t)
 }

@@ -1,9 +1,9 @@
-package concertrepo_test
+package reservationrepo_test
 
 import (
 	"testing"
 	"ticket-reservation/internal/domain/repository"
-	concertrepo "ticket-reservation/internal/infra/db/repository/concert"
+	reservationrepo "ticket-reservation/internal/infra/db/repository/reservation"
 	"ticket-reservation/pkg/testhelper"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -12,13 +12,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func initTest(t *testing.T) *testhelper.RepoTestHelper[repository.ConcertRepository] {
-	return testhelper.InitRepoTest(t, func(db *sqlx.DB) repository.ConcertRepository {
-		return concertrepo.NewConcertRepository(db)
+func initTest(t *testing.T) *testhelper.RepoTestHelper[repository.ReservationRepository] {
+	return testhelper.InitRepoTest(t, func(db *sqlx.DB) repository.ReservationRepository {
+		return reservationrepo.NewReservationRepository(db)
 	})
 }
 
-func TestNewConcertRepository(t *testing.T) {
+func TestNewReservationRepository(t *testing.T) {
 	db, _, err := sqlmock.New()
 	require.NoError(t, err)
 	defer db.Close()
@@ -26,17 +26,17 @@ func TestNewConcertRepository(t *testing.T) {
 	mockDB := sqlx.NewDb(db, "sqlmock")
 
 	// Execute
-	repo := concertrepo.NewConcertRepository(mockDB)
+	repo := reservationrepo.NewReservationRepository(mockDB)
 
 	// Assert
 	assert.NotNil(t, repo)
 }
 
-func TestConcertRepositoryImpl_WithTx(t *testing.T) {
+func TestReservationRepositoryImpl_WithTx(t *testing.T) {
 	h := initTest(t)
 	defer h.Done()
 
-	// Create a mock transaction database
+	// Create a mock transaction
 	txDB, _, err := sqlmock.New()
 	require.NoError(t, err)
 	defer txDB.Close()
