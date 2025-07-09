@@ -1,4 +1,4 @@
-package reservationrepo
+package reservationrepo_test
 
 import (
 	"testing"
@@ -10,6 +10,7 @@ import (
 
 	"ticket-reservation/internal/domain/entity"
 	"ticket-reservation/internal/infra/db/model_gen/ticket-reservation/public/model"
+	reservationrepo "ticket-reservation/internal/infra/db/repository/reservation"
 
 	"github.com/kittipat1413/go-common/util/pointer"
 )
@@ -25,13 +26,13 @@ func TestReservation_ToEntity(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		input          Reservation
+		input          reservationrepo.Reservation
 		expectedEntity *entity.Reservation
 		expectedNil    bool
 	}{
 		{
 			name: "successful conversion with pending status",
-			input: Reservation{
+			input: reservationrepo.Reservation{
 				Reservations: model.Reservations{
 					ID:         testID,
 					SeatID:     testSeatID,
@@ -57,7 +58,7 @@ func TestReservation_ToEntity(t *testing.T) {
 		},
 		{
 			name: "successful conversion with confirmed status",
-			input: Reservation{
+			input: reservationrepo.Reservation{
 				Reservations: model.Reservations{
 					ID:         testID,
 					SeatID:     testSeatID,
@@ -83,7 +84,7 @@ func TestReservation_ToEntity(t *testing.T) {
 		},
 		{
 			name: "successful conversion with expired status",
-			input: Reservation{
+			input: reservationrepo.Reservation{
 				Reservations: model.Reservations{
 					ID:         testID,
 					SeatID:     testSeatID,
@@ -109,7 +110,7 @@ func TestReservation_ToEntity(t *testing.T) {
 		},
 		{
 			name: "invalid status returns nil",
-			input: Reservation{
+			input: reservationrepo.Reservation{
 				Reservations: model.Reservations{
 					ID:         testID,
 					SeatID:     testSeatID,
@@ -126,7 +127,7 @@ func TestReservation_ToEntity(t *testing.T) {
 		},
 		{
 			name: "empty status returns nil",
-			input: Reservation{
+			input: reservationrepo.Reservation{
 				Reservations: model.Reservations{
 					ID:         testID,
 					SeatID:     testSeatID,
@@ -143,7 +144,7 @@ func TestReservation_ToEntity(t *testing.T) {
 		},
 		{
 			name: "conversion with zero time values",
-			input: Reservation{
+			input: reservationrepo.Reservation{
 				Reservations: model.Reservations{
 					ID:         testID,
 					SeatID:     testSeatID,
@@ -169,7 +170,7 @@ func TestReservation_ToEntity(t *testing.T) {
 		},
 		{
 			name: "conversion with empty session ID",
-			input: Reservation{
+			input: reservationrepo.Reservation{
 				Reservations: model.Reservations{
 					ID:         testID,
 					SeatID:     testSeatID,
@@ -233,20 +234,20 @@ func TestReservations_ToEntities(t *testing.T) {
 
 	tests := []struct {
 		name               string
-		input              Reservations
+		input              reservationrepo.Reservations
 		expectedEntities   *entity.Reservations
 		expectedLength     int
 		shouldSkipInvalids bool
 	}{
 		{
 			name:             "empty slice",
-			input:            Reservations{},
+			input:            reservationrepo.Reservations{},
 			expectedEntities: &entity.Reservations{},
 			expectedLength:   0,
 		},
 		{
 			name: "single reservation",
-			input: Reservations{
+			input: reservationrepo.Reservations{
 				{
 					Reservations: model.Reservations{
 						ID:         testID1,
@@ -276,7 +277,7 @@ func TestReservations_ToEntities(t *testing.T) {
 		},
 		{
 			name: "multiple reservations",
-			input: Reservations{
+			input: reservationrepo.Reservations{
 				{
 					Reservations: model.Reservations{
 						ID:         testID1,
@@ -328,7 +329,7 @@ func TestReservations_ToEntities(t *testing.T) {
 		},
 		{
 			name: "mixed valid and invalid reservations",
-			input: Reservations{
+			input: reservationrepo.Reservations{
 				{
 					Reservations: model.Reservations{
 						ID:         testID1,
@@ -393,7 +394,7 @@ func TestReservations_ToEntities(t *testing.T) {
 		},
 		{
 			name: "all invalid reservations",
-			input: Reservations{
+			input: reservationrepo.Reservations{
 				{
 					Reservations: model.Reservations{
 						ID:         testID1,
@@ -452,7 +453,7 @@ func TestReservations_ToEntities(t *testing.T) {
 func TestReservations_ToEntities_EmptyAndNilChecks(t *testing.T) {
 	tests := []struct {
 		name   string
-		input  Reservations
+		input  reservationrepo.Reservations
 		assert func(t *testing.T, result *entity.Reservations)
 	}{
 		{
@@ -465,7 +466,7 @@ func TestReservations_ToEntities_EmptyAndNilChecks(t *testing.T) {
 		},
 		{
 			name:  "empty slice",
-			input: Reservations{},
+			input: reservationrepo.Reservations{},
 			assert: func(t *testing.T, result *entity.Reservations) {
 				require.NotNil(t, result)
 				assert.Equal(t, 0, len(*result))
@@ -473,7 +474,7 @@ func TestReservations_ToEntities_EmptyAndNilChecks(t *testing.T) {
 		},
 		{
 			name: "slice with nil ToEntity results",
-			input: Reservations{
+			input: reservationrepo.Reservations{
 				{
 					Reservations: model.Reservations{
 						ID:         uuid.New(),
@@ -504,7 +505,7 @@ func TestReservations_ToEntities_EmptyAndNilChecks(t *testing.T) {
 
 func TestReservations_ToEntities_ReturnType(t *testing.T) {
 	// Test that ToEntities always returns a pointer to entity.Reservations
-	input := Reservations{}
+	input := reservationrepo.Reservations{}
 	result := input.ToEntities()
 
 	// Check that it's a pointer

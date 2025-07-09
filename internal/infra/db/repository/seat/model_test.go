@@ -1,4 +1,4 @@
-package seatrepo
+package seatrepo_test
 
 import (
 	"testing"
@@ -10,12 +10,12 @@ import (
 
 	"ticket-reservation/internal/domain/entity"
 	"ticket-reservation/internal/infra/db/model_gen/ticket-reservation/public/model"
+	seatrepo "ticket-reservation/internal/infra/db/repository/seat"
 
 	"github.com/kittipat1413/go-common/util/pointer"
 )
 
 func TestSeat_ToEntity(t *testing.T) {
-	// Test data
 	testID := uuid.New()
 	testZoneID := uuid.New()
 	testSeatNumber := "A1"
@@ -26,13 +26,13 @@ func TestSeat_ToEntity(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		input          Seat
+		input          seatrepo.Seat
 		expectedEntity *entity.Seat
 		expectedNil    bool
 	}{
 		{
 			name: "successful conversion with available status",
-			input: Seat{
+			input: seatrepo.Seat{
 				Seats: model.Seats{
 					ID:                testID,
 					ZoneID:            testZoneID,
@@ -58,7 +58,7 @@ func TestSeat_ToEntity(t *testing.T) {
 		},
 		{
 			name: "successful conversion with pending status",
-			input: Seat{
+			input: seatrepo.Seat{
 				Seats: model.Seats{
 					ID:                testID,
 					ZoneID:            testZoneID,
@@ -84,7 +84,7 @@ func TestSeat_ToEntity(t *testing.T) {
 		},
 		{
 			name: "successful conversion with booked status",
-			input: Seat{
+			input: seatrepo.Seat{
 				Seats: model.Seats{
 					ID:                testID,
 					ZoneID:            testZoneID,
@@ -110,7 +110,7 @@ func TestSeat_ToEntity(t *testing.T) {
 		},
 		{
 			name: "invalid status returns nil",
-			input: Seat{
+			input: seatrepo.Seat{
 				Seats: model.Seats{
 					ID:                testID,
 					ZoneID:            testZoneID,
@@ -127,7 +127,7 @@ func TestSeat_ToEntity(t *testing.T) {
 		},
 		{
 			name: "empty status returns nil",
-			input: Seat{
+			input: seatrepo.Seat{
 				Seats: model.Seats{
 					ID:                testID,
 					ZoneID:            testZoneID,
@@ -144,7 +144,7 @@ func TestSeat_ToEntity(t *testing.T) {
 		},
 		{
 			name: "conversion with zero time values",
-			input: Seat{
+			input: seatrepo.Seat{
 				Seats: model.Seats{
 					ID:                testID,
 					ZoneID:            testZoneID,
@@ -170,7 +170,7 @@ func TestSeat_ToEntity(t *testing.T) {
 		},
 		{
 			name: "conversion with empty seat number",
-			input: Seat{
+			input: seatrepo.Seat{
 				Seats: model.Seats{
 					ID:                testID,
 					ZoneID:            testZoneID,
@@ -233,7 +233,6 @@ func TestSeat_ToEntity(t *testing.T) {
 }
 
 func TestSeats_ToEntities(t *testing.T) {
-	// Test data
 	testID1 := uuid.New()
 	testID2 := uuid.New()
 	testID3 := uuid.New()
@@ -250,19 +249,19 @@ func TestSeats_ToEntities(t *testing.T) {
 
 	tests := []struct {
 		name             string
-		input            Seats
+		input            seatrepo.Seats
 		expectedEntities *entity.Seats
 		expectedLength   int
 	}{
 		{
 			name:             "empty slice",
-			input:            Seats{},
+			input:            seatrepo.Seats{},
 			expectedEntities: &entity.Seats{},
 			expectedLength:   0,
 		},
 		{
 			name: "single seat",
-			input: Seats{
+			input: seatrepo.Seats{
 				{
 					Seats: model.Seats{
 						ID:                testID1,
@@ -292,7 +291,7 @@ func TestSeats_ToEntities(t *testing.T) {
 		},
 		{
 			name: "multiple seats",
-			input: Seats{
+			input: seatrepo.Seats{
 				{
 					Seats: model.Seats{
 						ID:                testID1,
@@ -344,7 +343,7 @@ func TestSeats_ToEntities(t *testing.T) {
 		},
 		{
 			name: "mixed valid and invalid seats",
-			input: Seats{
+			input: seatrepo.Seats{
 				{
 					Seats: model.Seats{
 						ID:                testID1,
@@ -408,7 +407,7 @@ func TestSeats_ToEntities(t *testing.T) {
 		},
 		{
 			name: "all invalid seats",
-			input: Seats{
+			input: seatrepo.Seats{
 				{
 					Seats: model.Seats{
 						ID:                testID1,
@@ -480,7 +479,7 @@ func TestSeats_ToEntities(t *testing.T) {
 func TestSeats_ToEntities_EmptyAndNilChecks(t *testing.T) {
 	tests := []struct {
 		name   string
-		input  Seats
+		input  seatrepo.Seats
 		assert func(t *testing.T, result *entity.Seats)
 	}{
 		{
@@ -493,7 +492,7 @@ func TestSeats_ToEntities_EmptyAndNilChecks(t *testing.T) {
 		},
 		{
 			name:  "empty slice",
-			input: Seats{},
+			input: seatrepo.Seats{},
 			assert: func(t *testing.T, result *entity.Seats) {
 				require.NotNil(t, result)
 				assert.Equal(t, 0, len(*result))
@@ -501,7 +500,7 @@ func TestSeats_ToEntities_EmptyAndNilChecks(t *testing.T) {
 		},
 		{
 			name: "slice with nil ToEntity results",
-			input: Seats{
+			input: seatrepo.Seats{
 				{
 					Seats: model.Seats{
 						ID:                uuid.New(),
@@ -532,7 +531,7 @@ func TestSeats_ToEntities_EmptyAndNilChecks(t *testing.T) {
 
 func TestSeats_ToEntities_ReturnType(t *testing.T) {
 	// Test that ToEntities always returns a pointer to entity.Seats
-	input := Seats{}
+	input := seatrepo.Seats{}
 	result := input.ToEntities()
 
 	// Check that it's a pointer
