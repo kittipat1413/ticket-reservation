@@ -13,7 +13,7 @@ import (
 )
 
 func initTest(t *testing.T) *testhelper.RepoTestHelper[repository.SeatRepository] {
-	return testhelper.InitRepoTest(t, func(db *sqlx.DB) repository.SeatRepository {
+	return testhelper.NewRepoTestHelper(t, func(db *sqlx.DB) repository.SeatRepository {
 		return seatrepo.NewSeatRepository(db)
 	})
 }

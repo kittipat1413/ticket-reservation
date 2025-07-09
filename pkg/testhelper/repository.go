@@ -15,9 +15,9 @@ type RepoTestHelper[T any] struct {
 	done       func()
 }
 
-// InitRepoTest creates a new test helper with a mock database for any repository type
+// NewRepoTestHelper creates a new test helper with a mock database for any repository type
 // repoFunc should be a function that takes a *sqlx.DB and returns the repository instance
-func InitRepoTest[T any](t *testing.T, repoFunc func(*sqlx.DB) T) *RepoTestHelper[T] {
+func NewRepoTestHelper[T any](t *testing.T, repoFunc func(*sqlx.DB) T) *RepoTestHelper[T] {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
 	sqlxDB := sqlx.NewDb(db, "sqlmock")
