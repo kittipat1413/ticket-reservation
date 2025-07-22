@@ -179,6 +179,8 @@ github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+o
 github.com/kisielk/sqlstruct v0.0.0-20201105191214-5f3e10d3ab46/go.mod h1:yyMNCyc/Ib3bDTKd379tNMpB/7/H5TjM2Y9QJ5THLbE=
 github.com/kittipat1413/go-common v0.16.0 h1:ugQWmpZ/jPNHiMhmt5GX9EXMUTO9l70CPU/gHHDZ4d8=
 github.com/kittipat1413/go-common v0.16.0/go.mod h1:VplNDrjvxtYSR00LF8uOAt5X+CDFtv0ZRoPHoRIGxTg=
+github.com/kittipat1413/go-common v0.17.0 h1:jRA2liOg4+V0lwvrFYz8WeVU8zAVpSt0XC8+LQLLX38=
+github.com/kittipat1413/go-common v0.17.0/go.mod h1:VplNDrjvxtYSR00LF8uOAt5X+CDFtv0ZRoPHoRIGxTg=
 github.com/klauspost/compress v1.18.0 h1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=
 github.com/klauspost/compress v1.18.0/go.mod h1:2Pp+KzxcywXVXMr50+X0Q/Lsb43OQHYWRCY2AiWywWQ=
 github.com/klauspost/cpuid/v2 v2.0.9/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa0213Md/qVLRg=
