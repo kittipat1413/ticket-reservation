@@ -120,26 +120,39 @@ func (s *Server) Start() error {
 		}
 	}()
 
-	// Wait for shutdown signal
+	// Wait for shutdown signal then runs provided shutdown tasks in the given order
 	shutdownDoneCh := serverutils.GracefulShutdownSystem(
 		ctx,
 		appLogger,
 		errCh,
 		30*time.Second,
-		map[string]serverutils.ShutdownOperation{
-			"HTTP Server": func(ctx context.Context) error {
-				return httpServer.Shutdown(ctx)
+		[]serverutils.ShutdownTask{
+			{
+				Name: "HTTP Server",
+				Op: func(ctx context.Context) error {
+					return httpServer.Shutdown(ctx)
+				},
 			},
-			"Tracer Provider": func(ctx context.Context) error {
-				return tracerProvider.Shutdown(ctx)
+			{
+				Name: "Tracer Provider",
+				Op: func(ctx context.Context) error {
+					return tracerProvider.Shutdown(ctx)
+				},
 			},
-			"Database connection": func(ctx context.Context) error {
-				return db.Close()
+			{
+				Name: "Redis client",
+				Op: func(ctx context.Context) error {
+					return redisClient.Close()
+				},
 			},
-			"Redis client": func(ctx context.Context) error {
-				return redisClient.Close()
+			{
+				Name: "Database connection",
+				Op: func(ctx context.Context) error {
+					return db.Close()
+				},
 			},
-			// Other resources can be added here
+			// Add more shutdown tasks as needed
+			// ⚠️ Note: The order of tasks matters.
 		},
 	)
 
