@@ -18,8 +18,7 @@ func (u *healthCheckUsecase) CheckReadiness(ctx context.Context) (ok bool, err e
 			ok, err = u.healthcheckRepository.CheckDatabaseReadiness(ctx)
 			return err
 		}, func(attempt int, err error) bool {
-			var dbErr *errsFramework.DatabaseError
-			if errors.As(err, &dbErr) {
+			if errors.As(err, &errsFramework.DatabaseError{}) {
 				return true // retry if database is not ready
 			}
 			return false

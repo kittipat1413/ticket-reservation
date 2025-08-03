@@ -22,3 +22,21 @@ func NewServiceCircuitBreakerError(data interface{}) error {
 		BaseError: baseErr,
 	}
 }
+
+// As implements the error.As interface for ServiceCircuitBreakerError.
+func (e *ServiceCircuitBreakerError) As(target interface{}) bool {
+	if target == nil {
+		return false
+	}
+
+	switch t := target.(type) {
+	case **ServiceCircuitBreakerError:
+		*t = e
+		return true
+	case *ServiceCircuitBreakerError:
+		*t = *e
+		return true
+	default:
+		return false
+	}
+}

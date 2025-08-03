@@ -12,6 +12,7 @@ import (
 
 	"github.com/google/uuid"
 	errsFramework "github.com/kittipat1413/go-common/framework/errors"
+	"github.com/kittipat1413/go-common/framework/logger"
 	traceFramework "github.com/kittipat1413/go-common/framework/trace"
 	"github.com/kittipat1413/go-common/framework/validator"
 	"github.com/kittipat1413/go-common/util/pointer"
@@ -70,8 +71,7 @@ func (u *seatUsecase) ReserveSeat(ctx context.Context, input ReserveSeatInput) (
 		// Find concert by ID and check if it has already passed
 		concert, err := u.concertRepository.FindOne(ctx, concertID)
 		if err != nil {
-			var notFoundErr *errsFramework.NotFoundError
-			if !errors.As(err, &notFoundErr) { // If the error is not a NotFoundError, wrap it as an internal server error
+			if !errors.As(err, &errsFramework.NotFoundError{}) { // If the error is not a NotFoundError, wrap it as an internal server error
 				err = errsFramework.WrapError(err, errsFramework.NewInternalServerError("failed to find concert by ID", nil))
 				return nil, err
 			}
@@ -85,8 +85,7 @@ func (u *seatUsecase) ReserveSeat(ctx context.Context, input ReserveSeatInput) (
 		// Find zone by ID and check if it belongs to the concert
 		zone, err := u.zoneRepository.FindOne(ctx, zoneID)
 		if err != nil {
-			var notFoundErr *errsFramework.NotFoundError
-			if !errors.As(err, &notFoundErr) { // If the error is not a NotFoundError, wrap it as an internal server error
+			if !errors.As(err, &errsFramework.NotFoundError{}) { // If the error is not a NotFoundError, wrap it as an internal server error
 				err = errsFramework.WrapError(err, errsFramework.NewInternalServerError("failed to find zone by ID", nil))
 				return nil, err
 			}
@@ -100,16 +99,23 @@ func (u *seatUsecase) ReserveSeat(ctx context.Context, input ReserveSeatInput) (
 		// Attempt to lock the seat
 		err = u.seatLocker.LockSeat(ctx, input.ConcertID, input.ZoneID, input.SeatID, input.SessionID, u.appConfig.SeatLockTTL)
 		if err != nil && errors.Is(err, cache.ErrSeatAlreadyLocked) {
+			// If the seat is already locked, return an error
 			err = errsFramework.WrapError(err, errs.NewSeatLockedError())
 			return nil, err
-
 		}
 		defer func() {
 			if err != nil {
-				// If an error occurs, unlock the seat
+				// If any error occurs, unlock the seat
+				// This ensures that the seat lock is released if the operation fails
 				unlockErr := u.seatLocker.UnlockSeat(ctx, input.ConcertID, input.ZoneID, input.SeatID, input.SessionID)
 				if unlockErr != nil {
-					err = errsFramework.WrapError(err, unlockErr)
+					// Log the error but do not return it, as the main error has already been handled
+					logger.FromContext(ctx).Error(ctx, "failed to unlock seat after error", unlockErr, logger.Fields{
+						"concert_id": input.ConcertID,
+						"zone_id":    input.ZoneID,
+						"seat_id":    input.SeatID,
+						"session_id": input.SessionID,
+					})
 				}
 			}
 		}()
@@ -131,8 +137,7 @@ func (u *seatUsecase) ReserveSeat(ctx context.Context, input ReserveSeatInput) (
 		// Get a seat with explicit row locking
 		seat, err := u.seatRepository.WithTx(tx.DB()).FindOne(ctx, seatID)
 		if err != nil {
-			var notFoundErr *errsFramework.NotFoundError
-			if !errors.As(err, &notFoundErr) { // If the error is not a NotFoundError, wrap it as an internal server error
+			if !errors.As(err, &errsFramework.NotFoundError{}) { // If the error is not a NotFoundError, wrap it as an internal server error
 				err = errsFramework.WrapError(err, errsFramework.NewInternalServerError("failed to find seat by ID", nil))
 				return nil, err
 			}

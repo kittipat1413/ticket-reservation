@@ -2,10 +2,10 @@ package seatrepo
 
 import (
 	"context"
-	"fmt"
 	domaincache "ticket-reservation/internal/domain/cache"
 	"time"
 
+	errsFramework "github.com/kittipat1413/go-common/framework/errors"
 	lockmanager "github.com/kittipat1413/go-common/framework/lockmanager"
 )
 
@@ -25,7 +25,7 @@ func (s *seatLocker) LockSeat(ctx context.Context, concertID, zoneID, seatID, to
 		return domaincache.ErrSeatAlreadyLocked
 	}
 	if err != nil {
-		return fmt.Errorf("seat locker: lock failed: %w", err)
+		return errsFramework.WrapError(err, errsFramework.NewDatabaseError("failed to lock seat", err.Error()))
 	}
 	return nil
 }
@@ -38,7 +38,7 @@ func (s *seatLocker) UnlockSeat(ctx context.Context, concertID, zoneID, seatID, 
 		return domaincache.ErrSeatUnlockDenied
 	}
 	if err != nil {
-		return fmt.Errorf("seat locker: unlock failed: %w", err)
+		return errsFramework.WrapError(err, errsFramework.NewDatabaseError("failed to unlock seat", err.Error()))
 	}
 	return nil
 }

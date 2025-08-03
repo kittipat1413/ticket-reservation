@@ -33,7 +33,7 @@ func (r *zoneRepositoryImpl) FindOne(ctx context.Context, id uuid.UUID) (zone *e
 	var model Zone
 	if err := r.execer.GetContext(ctx, &model, query, args...); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errsFramework.WrapError(err, errsFramework.NewNotFoundError("zone not found", nil))
+			return nil, errsFramework.NewNotFoundError("zone not found", nil)
 		}
 		return nil, errsFramework.WrapError(err, errsFramework.NewDatabaseError("error while getting zone", err.Error()))
 	}

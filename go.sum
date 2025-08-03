@@ -181,6 +181,8 @@ github.com/kittipat1413/go-common v0.16.0 h1:ugQWmpZ/jPNHiMhmt5GX9EXMUTO9l70CPU/
 github.com/kittipat1413/go-common v0.16.0/go.mod h1:VplNDrjvxtYSR00LF8uOAt5X+CDFtv0ZRoPHoRIGxTg=
 github.com/kittipat1413/go-common v0.17.0 h1:jRA2liOg4+V0lwvrFYz8WeVU8zAVpSt0XC8+LQLLX38=
 github.com/kittipat1413/go-common v0.17.0/go.mod h1:VplNDrjvxtYSR00LF8uOAt5X+CDFtv0ZRoPHoRIGxTg=
+github.com/kittipat1413/go-common v0.18.0 h1:AVpFCExq7ywfwd77MeJ/mh7bUOS3IpBZvzGaqb/5PdQ=
+github.com/kittipat1413/go-common v0.18.0/go.mod h1:VplNDrjvxtYSR00LF8uOAt5X+CDFtv0ZRoPHoRIGxTg=
 github.com/klauspost/compress v1.18.0 h1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=
 github.com/klauspost/compress v1.18.0/go.mod h1:2Pp+KzxcywXVXMr50+X0Q/Lsb43OQHYWRCY2AiWywWQ=
 github.com/klauspost/cpuid/v2 v2.0.9/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa0213Md/qVLRg=

@@ -33,7 +33,7 @@ func (r *seatRepositoryImpl) FindOne(ctx context.Context, id uuid.UUID) (seat *e
 	var model Seat
 	if err := r.execer.GetContext(ctx, &model, query, args...); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errsFramework.WrapError(err, errsFramework.NewNotFoundError("seat not found", nil))
+			return nil, errsFramework.NewNotFoundError("seat not found", nil)
 		}
 		return nil, errsFramework.WrapError(err, errsFramework.NewDatabaseError("error while getting seat", err.Error()))
 	}

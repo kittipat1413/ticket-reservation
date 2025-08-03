@@ -42,8 +42,7 @@ func (u *concertUsecase) FindOneConcert(ctx context.Context, input FindOneConcer
 		// Find concert by ID
 		concert, err := u.concertRepository.FindOne(ctx, concertID)
 		if err != nil {
-			var notFoundErr *errsFramework.NotFoundError
-			if !errors.As(err, &notFoundErr) { // If the error is not a NotFoundError, wrap it as an internal server error
+			if !errors.As(err, &errsFramework.NotFoundError{}) { // If the error is not a NotFoundError, wrap it as an internal server error
 				return nil, errsFramework.WrapError(err, errsFramework.NewInternalServerError("failed to find concert by ID", nil))
 			}
 			return nil, err // Return the NotFoundError directly
