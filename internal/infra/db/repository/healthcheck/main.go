@@ -9,7 +9,6 @@ type healthCheckRepositoryImpl struct {
 	db db.SqlExecer
 }
 
-// NewHealthCheckRepository creates a new instance of HealthCheckRepository.
 func NewHealthCheckRepository(db db.SqlExecer) repository.HealthCheckRepository {
 	return &healthCheckRepositoryImpl{db: db}
 }
