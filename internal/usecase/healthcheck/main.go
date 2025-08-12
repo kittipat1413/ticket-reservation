@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"ticket-reservation/internal/domain/cache"
 	"ticket-reservation/internal/domain/repository"
 
 	"github.com/kittipat1413/go-common/framework/retry"
@@ -14,15 +15,18 @@ type HealthCheckUsecase interface {
 
 type healthCheckUsecase struct {
 	retrier               retry.Retrier
-	healthcheckRepository repository.HealthCheckRepository
+	dbHealthRepository    repository.HealthCheckRepository
+	redisHealthRepository cache.HealthCheckRepository
 }
 
 func NewHealthCheckUsecase(
 	retrier retry.Retrier,
 	healthcheckRepository repository.HealthCheckRepository,
+	redisHealthRepository cache.HealthCheckRepository,
 ) HealthCheckUsecase {
 	return &healthCheckUsecase{
 		retrier:               retrier,
-		healthcheckRepository: healthcheckRepository,
+		dbHealthRepository:    healthcheckRepository,
+		redisHealthRepository: redisHealthRepository,
 	}
 }

@@ -10,13 +10,14 @@ import (
 	"github.com/redis/go-redis/v9"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 
-	infraDB "ticket-reservation/internal/infra/db"
-	seatRedisRepo "ticket-reservation/internal/infra/redis/repository/seat"
-
 	redsyncLocker "github.com/kittipat1413/go-common/framework/lockmanager/redsync"
 
+	redisHealthCheckRepo "ticket-reservation/internal/infra/redis/repository/healthcheck"
+	seatRedisRepo "ticket-reservation/internal/infra/redis/repository/seat"
+
+	infraDB "ticket-reservation/internal/infra/db"
 	concertRepo "ticket-reservation/internal/infra/db/repository/concert"
-	healthcheckRepo "ticket-reservation/internal/infra/db/repository/healthcheck"
+	dbHealthCheckRepo "ticket-reservation/internal/infra/db/repository/healthcheck"
 	reservationRepo "ticket-reservation/internal/infra/db/repository/reservation"
 	seatRepo "ticket-reservation/internal/infra/db/repository/seat"
 	zonerepo "ticket-reservation/internal/infra/db/repository/zone"
@@ -41,11 +42,12 @@ func (s *Server) setupRouteDependencies(ctx context.Context, tracerProvider *sdk
 	transactorFactory := infraDB.NewSqlxTransactorFactory(dbConn)
 
 	// Redis Repositories
+	redisHealthRepo := redisHealthCheckRepo.NewHealthCheckRepository(redisClient)
 	seatLockerRepo := seatRedisRepo.NewSeatLockerRepository(lockmanager)
 	seatMapRepo := seatRedisRepo.NewSeatMapRepository(redisClient)
 
 	// DB Repositories
-	healthRepo := healthcheckRepo.NewHealthCheckRepository(dbConn)
+	dbHealthRepo := dbHealthCheckRepo.NewHealthCheckRepository(dbConn)
 	concertRepo := concertRepo.NewConcertRepository(dbConn)
 	zoneRepo := zonerepo.NewZoneRepository(dbConn)
 	seatRepo := seatRepo.NewSeatRepository(dbConn)
@@ -59,7 +61,7 @@ func (s *Server) setupRouteDependencies(ctx context.Context, tracerProvider *sdk
 	})
 
 	// Usecases
-	healthcheckUsecase := healthcheckUsecase.NewHealthCheckUsecase(queryRetrier, healthRepo)
+	healthcheckUsecase := healthcheckUsecase.NewHealthCheckUsecase(queryRetrier, dbHealthRepo, redisHealthRepo)
 	concertUsecase := concertUsecase.NewConcertUsecase(s.cfg.App, transactorFactory, concertRepo)
 	seatUsecase := seatUsecase.NewSeatUsecase(s.cfg.App, concertRepo, zoneRepo, seatRepo, reservationRepo, transactorFactory, seatLockerRepo, seatMapRepo)
 
