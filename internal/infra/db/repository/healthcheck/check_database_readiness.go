@@ -8,7 +8,7 @@ import (
 )
 
 func (r *healthCheckRepositoryImpl) CheckDatabaseReadiness(ctx context.Context) (ok bool, err error) {
-	errLocation := "[repository healthcheck/check_database_readiness CheckDatabaseReadiness] "
+	const errLocation = "[repository healthcheck/check_database_readiness CheckDatabaseReadiness] "
 	defer errsFramework.WrapErrorWithPrefix(errLocation, &err)
 
 	stmt := postgres.RawStatement(`SELECT 1=1`)

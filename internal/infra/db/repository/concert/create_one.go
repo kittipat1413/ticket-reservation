@@ -10,7 +10,7 @@ import (
 )
 
 func (r *concertRepositoryImpl) CreateOne(ctx context.Context, input *entity.Concert) (concert *entity.Concert, err error) {
-	errLocation := "[repository concert/create_one CreateOne] "
+	const errLocation = "[repository concert/create_one CreateOne] "
 	defer errsFramework.WrapErrorWithPrefix(errLocation, &err)
 
 	concertsTable := table.Concerts

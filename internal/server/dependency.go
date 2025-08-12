@@ -41,7 +41,8 @@ func (s *Server) setupRouteDependencies(ctx context.Context, tracerProvider *sdk
 	transactorFactory := infraDB.NewSqlxTransactorFactory(dbConn)
 
 	// Redis Repositories
-	seatLocker := seatRedisRepo.NewSeatLocker(lockmanager)
+	seatLockerRepo := seatRedisRepo.NewSeatLockerRepository(lockmanager)
+	seatMapRepo := seatRedisRepo.NewSeatMapRepository(redisClient)
 
 	// DB Repositories
 	healthRepo := healthcheckRepo.NewHealthCheckRepository(dbConn)
@@ -60,7 +61,7 @@ func (s *Server) setupRouteDependencies(ctx context.Context, tracerProvider *sdk
 	// Usecases
 	healthcheckUsecase := healthcheckUsecase.NewHealthCheckUsecase(queryRetrier, healthRepo)
 	concertUsecase := concertUsecase.NewConcertUsecase(s.cfg.App, transactorFactory, concertRepo)
-	seatUsecase := seatUsecase.NewSeatUsecase(s.cfg.App, concertRepo, zoneRepo, seatRepo, reservationRepo, transactorFactory, seatLocker)
+	seatUsecase := seatUsecase.NewSeatUsecase(s.cfg.App, concertRepo, zoneRepo, seatRepo, reservationRepo, transactorFactory, seatLockerRepo, seatMapRepo)
 
 	// Application middleware
 	appMiddleware := middleware.New()

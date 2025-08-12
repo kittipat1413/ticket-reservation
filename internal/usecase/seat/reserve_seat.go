@@ -12,7 +12,7 @@ import (
 
 	"github.com/google/uuid"
 	errsFramework "github.com/kittipat1413/go-common/framework/errors"
-	"github.com/kittipat1413/go-common/framework/logger"
+	commonLogger "github.com/kittipat1413/go-common/framework/logger"
 	traceFramework "github.com/kittipat1413/go-common/framework/trace"
 	"github.com/kittipat1413/go-common/framework/validator"
 	"github.com/kittipat1413/go-common/util/pointer"
@@ -30,6 +30,7 @@ func (u *seatUsecase) ReserveSeat(ctx context.Context, input ReserveSeatInput) (
 	defer errsFramework.WrapErrorWithPrefix(errLocation, &err)
 
 	return traceFramework.TraceFunc(ctx, traceFramework.GetTracer("seat.usecase"), func(ctx context.Context) (*entity.Reservation, error) {
+		logger := commonLogger.FromContext(ctx)
 		requestTime := time.Now()
 
 		// Create a new validator instance
@@ -97,7 +98,7 @@ func (u *seatUsecase) ReserveSeat(ctx context.Context, input ReserveSeatInput) (
 		}
 
 		// Attempt to lock the seat
-		err = u.seatLocker.LockSeat(ctx, input.ConcertID, input.ZoneID, input.SeatID, input.SessionID, u.appConfig.SeatLockTTL)
+		err = u.seatLockerRepository.LockSeat(ctx, concertID, zoneID, seatID, input.SessionID, u.appConfig.SeatLockTTL)
 		if err != nil && errors.Is(err, cache.ErrSeatAlreadyLocked) {
 			// If the seat is already locked, return an error
 			err = errsFramework.WrapError(err, errs.NewSeatLockedError())
@@ -107,10 +108,10 @@ func (u *seatUsecase) ReserveSeat(ctx context.Context, input ReserveSeatInput) (
 			if err != nil {
 				// If any error occurs, unlock the seat
 				// This ensures that the seat lock is released if the operation fails
-				unlockErr := u.seatLocker.UnlockSeat(ctx, input.ConcertID, input.ZoneID, input.SeatID, input.SessionID)
+				unlockErr := u.seatLockerRepository.UnlockSeat(ctx, concertID, zoneID, seatID, input.SessionID)
 				if unlockErr != nil {
 					// Log the error but do not return it, as the main error has already been handled
-					logger.FromContext(ctx).Error(ctx, "failed to unlock seat after error", unlockErr, logger.Fields{
+					logger.Error(ctx, "failed to unlock seat after error", unlockErr, commonLogger.Fields{
 						"concert_id": input.ConcertID,
 						"zone_id":    input.ZoneID,
 						"seat_id":    input.SeatID,
@@ -217,10 +218,16 @@ func (u *seatUsecase) ReserveSeat(ctx context.Context, input ReserveSeatInput) (
 			}
 		}
 
-		/*
-		 TODO: update redis cache for seat map
-		 	HSET seat_map:concert:{cid}:zone:{zid} A5 "pending"
-		*/
+		// Update seat map in Redis
+		setMapErr := u.seatMapRepository.SetSeat(ctx, concertID, zoneID, *seat, u.appConfig.SeatLockTTL)
+		if setMapErr != nil {
+			logger.Error(ctx, "failed to update seat map in Redis", setMapErr, commonLogger.Fields{
+				"concert_id":  concertID,
+				"zone_id":     zoneID,
+				"seat_id":     seatID,
+				"seat_number": seat.SeatNumber,
+			})
+		}
 
 		return reservation, nil
 	})

@@ -10,7 +10,7 @@ import (
 )
 
 func (r *reservationRepositoryImpl) CreateOne(ctx context.Context, input *entity.Reservation) (reservation *entity.Reservation, err error) {
-	errLocation := "[repository reservation/create_one CreateOne] "
+	const errLocation = "[repository reservation/create_one CreateOne] "
 	defer errsFramework.WrapErrorWithPrefix(errLocation, &err)
 
 	reservationsTable := table.Reservations

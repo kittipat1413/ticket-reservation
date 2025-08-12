@@ -10,33 +10,34 @@ import (
 	time "time"
 
 	gomock "github.com/golang/mock/gomock"
+	uuid "github.com/google/uuid"
 )
 
-// MockSeatLocker is a mock of SeatLocker interface.
-type MockSeatLocker struct {
+// MockSeatLockerRepository is a mock of SeatLockerRepository interface.
+type MockSeatLockerRepository struct {
 	ctrl     *gomock.Controller
-	recorder *MockSeatLockerMockRecorder
+	recorder *MockSeatLockerRepositoryMockRecorder
 }
 
-// MockSeatLockerMockRecorder is the mock recorder for MockSeatLocker.
-type MockSeatLockerMockRecorder struct {
-	mock *MockSeatLocker
+// MockSeatLockerRepositoryMockRecorder is the mock recorder for MockSeatLockerRepository.
+type MockSeatLockerRepositoryMockRecorder struct {
+	mock *MockSeatLockerRepository
 }
 
-// NewMockSeatLocker creates a new mock instance.
-func NewMockSeatLocker(ctrl *gomock.Controller) *MockSeatLocker {
-	mock := &MockSeatLocker{ctrl: ctrl}
-	mock.recorder = &MockSeatLockerMockRecorder{mock}
+// NewMockSeatLockerRepository creates a new mock instance.
+func NewMockSeatLockerRepository(ctrl *gomock.Controller) *MockSeatLockerRepository {
+	mock := &MockSeatLockerRepository{ctrl: ctrl}
+	mock.recorder = &MockSeatLockerRepositoryMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockSeatLocker) EXPECT() *MockSeatLockerMockRecorder {
+func (m *MockSeatLockerRepository) EXPECT() *MockSeatLockerRepositoryMockRecorder {
 	return m.recorder
 }
 
 // LockSeat mocks base method.
-func (m *MockSeatLocker) LockSeat(ctx context.Context, concertID, zoneID, seatID, token string, ttl time.Duration) error {
+func (m *MockSeatLockerRepository) LockSeat(ctx context.Context, concertID, zoneID, seatID uuid.UUID, token string, ttl time.Duration) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LockSeat", ctx, concertID, zoneID, seatID, token, ttl)
 	ret0, _ := ret[0].(error)
@@ -44,13 +45,13 @@ func (m *MockSeatLocker) LockSeat(ctx context.Context, concertID, zoneID, seatID
 }
 
 // LockSeat indicates an expected call of LockSeat.
-func (mr *MockSeatLockerMockRecorder) LockSeat(ctx, concertID, zoneID, seatID, token, ttl interface{}) *gomock.Call {
+func (mr *MockSeatLockerRepositoryMockRecorder) LockSeat(ctx, concertID, zoneID, seatID, token, ttl interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LockSeat", reflect.TypeOf((*MockSeatLocker)(nil).LockSeat), ctx, concertID, zoneID, seatID, token, ttl)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LockSeat", reflect.TypeOf((*MockSeatLockerRepository)(nil).LockSeat), ctx, concertID, zoneID, seatID, token, ttl)
 }
 
 // UnlockSeat mocks base method.
-func (m *MockSeatLocker) UnlockSeat(ctx context.Context, concertID, zoneID, seatID, token string) error {
+func (m *MockSeatLockerRepository) UnlockSeat(ctx context.Context, concertID, zoneID, seatID uuid.UUID, token string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UnlockSeat", ctx, concertID, zoneID, seatID, token)
 	ret0, _ := ret[0].(error)
@@ -58,7 +59,7 @@ func (m *MockSeatLocker) UnlockSeat(ctx context.Context, concertID, zoneID, seat
 }
 
 // UnlockSeat indicates an expected call of UnlockSeat.
-func (mr *MockSeatLockerMockRecorder) UnlockSeat(ctx, concertID, zoneID, seatID, token interface{}) *gomock.Call {
+func (mr *MockSeatLockerRepositoryMockRecorder) UnlockSeat(ctx, concertID, zoneID, seatID, token interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnlockSeat", reflect.TypeOf((*MockSeatLocker)(nil).UnlockSeat), ctx, concertID, zoneID, seatID, token)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnlockSeat", reflect.TypeOf((*MockSeatLockerRepository)(nil).UnlockSeat), ctx, concertID, zoneID, seatID, token)
 }

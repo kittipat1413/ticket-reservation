@@ -13,7 +13,7 @@ import (
 )
 
 func (r *concertRepositoryImpl) FindOne(ctx context.Context, id uuid.UUID) (concert *entity.Concert, err error) {
-	errLocation := "[repository concert/find_one FindOne] "
+	const errLocation = "[repository concert/find_one FindOne] "
 	defer errsFramework.WrapErrorWithPrefix(errLocation, &err)
 
 	concertsTable := table.Concerts

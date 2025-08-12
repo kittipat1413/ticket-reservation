@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 var (
@@ -14,11 +16,11 @@ var (
 )
 
 //go:generate mockgen -source=./seat_lock_repository.go -destination=./mocks/seat_lock_repository.go -package=cache_mocks
-type SeatLocker interface {
+type SeatLockerRepository interface {
 	// LockSeat attempts to lock a specific seat for a concert in a given zone.
 	// Returns ErrSeatAlreadyLocked if the seat is already locked by another process.
-	LockSeat(ctx context.Context, concertID, zoneID, seatID, token string, ttl time.Duration) error
+	LockSeat(ctx context.Context, concertID, zoneID, seatID uuid.UUID, token string, ttl time.Duration) error
 	// UnlockSeat releases the lock on a specific seat for a concert in a given zone.
 	// Returns ErrSeatUnlockDenied if the unlock operation is denied, likely due to a token mismatch.
-	UnlockSeat(ctx context.Context, concertID, zoneID, seatID, token string) error
+	UnlockSeat(ctx context.Context, concertID, zoneID, seatID uuid.UUID, token string) error
 }

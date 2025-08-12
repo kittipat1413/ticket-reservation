@@ -21,7 +21,8 @@ type seatUsecase struct {
 	seatRepository        repository.SeatRepository
 	reservationRepository repository.ReservationRepository
 	transactorFactory     db.SqlxTransactorFactory
-	seatLocker            cache.SeatLocker
+	seatLockerRepository  cache.SeatLockerRepository
+	seatMapRepository     cache.SeatMapRepository
 }
 
 func NewSeatUsecase(
@@ -31,7 +32,8 @@ func NewSeatUsecase(
 	seatRepository repository.SeatRepository,
 	reservationRepository repository.ReservationRepository,
 	transactorFactory db.SqlxTransactorFactory,
-	seatLocker cache.SeatLocker,
+	seatLockerRepository cache.SeatLockerRepository,
+	seatMapRepository cache.SeatMapRepository,
 ) SeatUsecase {
 	return &seatUsecase{
 		appConfig:             appConfig,
@@ -40,6 +42,7 @@ func NewSeatUsecase(
 		seatRepository:        seatRepository,
 		reservationRepository: reservationRepository,
 		transactorFactory:     transactorFactory,
-		seatLocker:            seatLocker,
+		seatLockerRepository:  seatLockerRepository,
+		seatMapRepository:     seatMapRepository,
 	}
 }
