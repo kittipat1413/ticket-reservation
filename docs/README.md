@@ -12,8 +12,9 @@ Welcome to the Ticket Reservation System documentation. This system provides hig
 - **[Tracing Setup](uptrace.md)** - OpenTelemetry and Uptrace configuration guide
 
 ## 🔗 Related Resources
-- **Main Repository**: [ticket-reservation](/)
+- **Available Commands**: [cmd](../cmd)
 - **Database Migrations**: [db/migrations](../db/migrations/)
 - **API Handlers**: [internal/api/http/handler](../internal/api/http/handler/)
 - **Use Cases**: [internal/usecase](../internal/usecase/)
-- **Domain Models**: [internal/domain](../internal/domain/)
+- **Domain**: [internal/domain](../internal/domain/)
+- **Infrastructure**: [internal/infra](../internal/infra/)

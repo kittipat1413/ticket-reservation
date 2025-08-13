@@ -12,7 +12,6 @@ The system follows Clean Architecture, separating concerns across layers:
 - **Database**: PostgreSQL with ACID transactions
 - **Cache & Locking**: Redis with TTL-based seat locks
 - **Transport**: REST APIs (WebSocket optional for real-time updates)
-- **Language**: Go with Clean Architecture patterns
 
 ### Database Schema Relationships
 ```mermaid
