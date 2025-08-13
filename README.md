@@ -1,8 +1,6 @@
 # 🎟️ Ticket Reservation System
 A simple ticket reservation system for managing concert tickets, including seat reservations and payment processing.
 This project is designed to be a starting point for building a more complex ticket reservation system.
-> **Note:** The high-level system design, API design details, and architectural diagrams are available in the [`/docs`](./docs) directory.
-
 > **🧩 Powered by go-common:**
 This project integrates [go-common](https://github.com/kittipat1413/go-common) — our standardized backend framework — across all layers:
 Structured Logging, Error Handling, Config Loader (Viper), Validation & Middleware Utilities, Tracing & Retry Helpers and more...
@@ -19,6 +17,13 @@ The project leverages a Clean Architecture structure to cleanly separate concern
 
 The project also includes several CLI commands (in the [`cmd/`](./cmd) directory) for tasks such as serving the API, running migrations, generating new migrations, printing configuration, and auto-generating SQL builder files.
 
+## 🔍 Design & Documentation
+
+### 📚 Complete Documentation Hub
+**Visit [📖 Documentation README](./docs/README.md)** for comprehensive documentation including:
+- **🏗️ System Design** - Complete architecture and design decisions
+- **📋 API Reference** - Complete Swagger specifications
+- **🔧 Operations Guide** - Tracing and monitoring setup
 
 ## 📂 Project Structure
 ```
@@ -150,12 +155,6 @@ For a full list of commands, run:
 ```bash
 go run main.go --help
 ```
-
-## 🔍 Design & Documentation
-- System Design & Architecture:
-The architectural decisions, design patterns, and system diagrams are documented in the [`/docs`](./docs) directory.
-- API Documentation:
-The generated Swagger documentation (see [`/docs/swagger.yaml`](./docs/swagger.yaml)) provides a detailed API specification, including endpoints, request/response schemas, and usage examples.
 
 ## ⚙️ Makefile Overview
 The project includes a `Makefile` to simplify common tasks and commands. Here are the available targets:

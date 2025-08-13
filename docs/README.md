@@ -1,5 +1,4 @@
 # 🎟️ Ticket Reservation System Documentation
-
 Welcome to the Ticket Reservation System documentation. This system provides high-performance concert seat reservations with real-time updates and reliable concurrency control.
 
 ## Documentation Index
