@@ -65,7 +65,6 @@ func TestConcertHandler_FindAllConcerts(t *testing.T) {
 		setupMocks       func(h *testHelper)
 		expectedStatus   int
 		expectedResponse map[string]interface{}
-		validateBody     func(t *testing.T, body map[string]interface{})
 	}{
 		{
 			name:        "successful retrieval with default parameters",
@@ -255,16 +254,10 @@ func TestConcertHandler_FindAllConcerts(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			// Create Gin context with query parameters using testhelper
-			builder := testhelper.NewGinCtx(w).
+			c := testhelper.NewGinCtx(w).
 				Method(http.MethodGet).
-				Path("/concerts")
-
-			// Add query parameters
-			for key, value := range tt.queryParams {
-				builder = builder.Query(key, value)
-			}
-
-			c := builder.
+				Path("/concerts").
+				Queries(tt.queryParams).
 				WithContext(logger.NewContext(context.Background(), logger.NewNoopLogger())).
 				MustBuild(t)
 
