@@ -18,6 +18,7 @@ import (
 	seatrepo "ticket-reservation/internal/infra/redis/repository/seat"
 
 	errsFramework "github.com/kittipat1413/go-common/framework/errors"
+	"github.com/kittipat1413/go-common/framework/logger"
 )
 
 func TestNewSeatMapRepository(t *testing.T) {
@@ -386,7 +387,7 @@ func TestSeatMapRepositoryImpl_GetAllSeats(t *testing.T) {
 			tt.setupMock(mock)
 
 			// Execute
-			result, err := repository.GetAllSeats(context.Background(), concertID, zoneID)
+			result, err := repository.GetAllSeats(logger.NewContext(context.Background(), logger.NewNoopLogger()), concertID, zoneID)
 
 			// Assert
 			if tt.expectedError {
