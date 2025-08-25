@@ -303,14 +303,8 @@ func TestConcertUsecase_FindAllConcerts(t *testing.T) {
 
 				// Validate expected result content if specified
 				if tt.expectedResult != nil && tt.expectedCount > 0 {
-					expectedConcerts := *tt.expectedResult
 					for i, concert := range data {
-						assert.Equal(t, expectedConcerts[i].ID, concert.ID, "Concert %d ID should match", i)
-						assert.Equal(t, expectedConcerts[i].Name, concert.Name, "Concert %d Name should match", i)
-						assert.Equal(t, expectedConcerts[i].Venue, concert.Venue, "Concert %d Venue should match", i)
-						assert.Equal(t, expectedConcerts[i].Date.UTC(), concert.Date.UTC(), "Concert %d Date should match", i)
-						assert.Equal(t, expectedConcerts[i].CreatedAt.UTC(), concert.CreatedAt.UTC(), "Concert %d CreatedAt should match", i)
-						assert.Equal(t, expectedConcerts[i].UpdatedAt.UTC(), concert.UpdatedAt.UTC(), "Concert %d UpdatedAt should match", i)
+						assert.Equal(t, pointer.GetValue(tt.expectedResult)[i], concert)
 					}
 				}
 

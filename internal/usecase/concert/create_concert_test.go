@@ -14,6 +14,7 @@ import (
 	concertusecase "ticket-reservation/internal/usecase/concert"
 
 	errsFramework "github.com/kittipat1413/go-common/framework/errors"
+	"github.com/kittipat1413/go-common/util/pointer"
 )
 
 func TestConcertUsecase_CreateConcert(t *testing.T) {
@@ -164,16 +165,7 @@ func TestConcertUsecase_CreateConcert(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 				assert.NotNil(t, result)
-
-				// Assert expected result if specified
-				if tt.expectedResult != nil {
-					assert.Equal(t, tt.expectedResult.ID, result.ID)
-					assert.Equal(t, tt.expectedResult.Name, result.Name)
-					assert.Equal(t, tt.expectedResult.Venue, result.Venue)
-					assert.Equal(t, tt.expectedResult.Date.UTC(), result.Date.UTC())
-					assert.Equal(t, tt.expectedResult.CreatedAt.UTC(), result.CreatedAt.UTC())
-					assert.Equal(t, tt.expectedResult.UpdatedAt.UTC(), result.UpdatedAt.UTC())
-				}
+				assert.Equal(t, pointer.GetValue(tt.expectedResult), pointer.GetValue(result))
 			}
 		})
 	}
