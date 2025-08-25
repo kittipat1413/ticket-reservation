@@ -7,12 +7,13 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	errsFramework "github.com/kittipat1413/go-common/framework/errors"
 	"github.com/kittipat1413/go-common/util/pointer"
 )
 
 type FindAllConcertsQuery struct {
-	StartDate *time.Time `form:"startDate" time_format:"2006-01-02" time_utc:"7"`
-	EndDate   *time.Time `form:"endDate" time_format:"2006-01-02" time_utc:"7"`
+	StartDate *time.Time `form:"startDate" time_format:"2006-01-02" time_location:"Asia/Bangkok"`
+	EndDate   *time.Time `form:"endDate" time_format:"2006-01-02" time_location:"Asia/Bangkok"`
 	Venue     *string    `form:"venue"`
 	Limit     *int64     `form:"limit"`
 	Offset    *int64     `form:"offset"`
@@ -45,6 +46,7 @@ type findAllConcertsResponse struct {
 func (h *concertHandler) FindAllConcerts(c *gin.Context) {
 	var query FindAllConcertsQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
+		err = errsFramework.WrapError(err, errsFramework.NewBadRequestError("unable to parse request", map[string]string{"details": err.Error()}))
 		httpresponse.Error(c, err)
 		return
 	}

@@ -1,0 +1,76 @@
+package handler_test
+
+import (
+	"context"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/kittipat1413/go-common/framework/logger"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"ticket-reservation/pkg/testhelper"
+)
+
+func TestHealthCheckHandler_Liveness(t *testing.T) {
+	tests := []struct {
+		name             string
+		setupMocks       func(h *testHelper)
+		expectedStatus   int
+		expectedResponse map[string]interface{}
+	}{
+		{
+			name: "successful liveness check",
+			setupMocks: func(h *testHelper) {
+				// Liveness doesn't call usecase, so no mock expectations needed
+			},
+			expectedStatus: http.StatusOK,
+			expectedResponse: map[string]interface{}{
+				"code": "ERR-200000",
+				"data": map[string]interface{}{
+					"status": "OK",
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h := initTest(t)
+			defer h.Done()
+
+			// Setup mocks for this test case
+			tt.setupMocks(h)
+
+			// Create response recorder
+			w := httptest.NewRecorder()
+
+			// Create Gin context using testhelper
+			c := testhelper.NewGinCtx(w).
+				Method(http.MethodGet).
+				Path("/health/liveness").
+				WithContext(logger.NewContext(context.Background(), logger.NewNoopLogger())).
+				MustBuild(t)
+
+			// Execute the handler
+			h.healthcheckHandler.Liveness(c)
+
+			// Assert HTTP status code
+			assert.Equal(t, tt.expectedStatus, w.Code)
+
+			// Assert response body
+			var responseBody map[string]interface{}
+			err := json.Unmarshal(w.Body.Bytes(), &responseBody)
+			require.NoError(t, err)
+
+			// Assert expected fields
+			for key, expectedValue := range tt.expectedResponse {
+				actualValue, exists := responseBody[key]
+				assert.True(t, exists, "Expected key '%s' to exist in response", key)
+				assert.Equal(t, expectedValue, actualValue, "Mismatch for key '%s'", key)
+			}
+		})
+	}
+}
