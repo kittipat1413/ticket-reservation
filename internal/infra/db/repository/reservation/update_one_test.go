@@ -265,9 +265,8 @@ func TestReservationRepositoryImpl_UpdateOne_NoFieldsToUpdate(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Nil(t, reservation)
 
-	// Verify no expectations were set
-	err = h.Mock.ExpectationsWereMet()
-	assert.NoError(t, err)
+	// Verify all expectations were met
+	h.AssertExpectationsMet(t)
 }
 
 func TestReservationRepositoryImpl_UpdateOne_ModelConversionError(t *testing.T) {
