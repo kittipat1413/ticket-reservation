@@ -435,6 +435,230 @@ func Test<UsecaseName>Usecase_<MethodName>(t *testing.T) {
 }
 ```
 
+### 4. **HTTP Handler Tests**
+
+#### Main Test File (`main_test.go`)
+```go
+package handler_test
+
+import (
+    "testing"
+    "time"
+
+    "github.com/golang/mock/gomock"
+    "github.com/stretchr/testify/assert"
+
+    handler "<project>/internal/api/http/handler/<handler>"
+    "ticket-reservation/internal/config"
+    <usecase>_mocks "<project>/internal/usecase/<usecase>/mocks"
+)
+
+type testHelper struct {
+    ctrl           *gomock.Controller
+    appConfig      config.AppConfig
+    mock<Usecase>  *<usecase>_mocks.Mock<UsecaseInterface>
+    <handler>      handler.<HandlerInterface>
+}
+
+func initTest(t *testing.T) *testHelper {
+    ctrl := gomock.NewController(t)
+
+    appConfig := config.AppConfig{
+        AdminAPIKey:    "test-api-key",
+        AdminAPISecret: "test-api-secret",
+        Timezone:       "Asia/Bangkok",
+        SeatLockTTL:    5 * time.Minute,
+    }
+
+    mock<Usecase> := <usecase>_mocks.NewMock<UsecaseInterface>(ctrl)
+
+    <handler> := handler.New<HandlerName>Handler(appConfig, mock<Usecase>)
+
+    return &testHelper{
+        ctrl:          ctrl,
+        appConfig:     appConfig,
+        mock<Usecase>: mock<Usecase>,
+        <handler>:     <handler>,
+    }
+}
+
+func (h *testHelper) Done() {
+    h.ctrl.Finish()
+}
+
+func TestNew<HandlerName>Handler(t *testing.T) {
+    ctrl := gomock.NewController(t)
+    defer ctrl.Finish()
+
+    appConfig := config.AppConfig{
+        AdminAPIKey:    "test-api-key",
+        AdminAPISecret: "test-api-secret",
+        Timezone:       "Asia/Bangkok",
+        SeatLockTTL:    5 * time.Minute,
+    }
+    mock<Usecase> := <usecase>_mocks.NewMock<UsecaseInterface>(ctrl)
+
+    // Execute
+    handler := handler.New<HandlerName>Handler(appConfig, mock<Usecase>)
+
+    // Assert
+    assert.NotNil(t, handler)
+}
+```
+
+#### HTTP Method Test Files
+```go
+func Test<HandlerName>Handler_<MethodName>(t *testing.T) {
+    bangkokTime, _ := time.LoadLocation("Asia/Bangkok")
+    expectedEntity := &entity.<EntityName>{
+        ID:        uuid.New(),
+        Name:      "Test Entity",
+        Date:      time.Date(2025, 6, 15, 19, 0, 0, 0, bangkokTime),
+        CreatedAt: time.Date(2024, 12, 1, 10, 0, 0, 0, bangkokTime),
+        UpdatedAt: time.Date(2024, 12, 15, 15, 30, 0, 0, bangkokTime),
+    }
+
+    tests := []struct {
+        name             string
+        requestBody      interface{}            // For POST/PUT requests
+        pathParams       map[string]string      // For path parameters
+        queryParams      map[string]interface{} // For query parameters
+        setupMocks       func(h *testHelper)
+        expectedStatus   int
+        expectedResponse map[string]interface{}
+    }{
+        {
+            name: "successful operation",
+            requestBody: map[string]interface{}{
+                "name": "Test Entity",
+                "date": "2025-06-15T19:00:00+07:00",
+            },
+            setupMocks: func(h *testHelper) {
+                h.mock<Usecase>.EXPECT().
+                    <Method>(gomock.Any(), gomock.Any()).
+                    DoAndReturn(func(ctx context.Context, input <usecase>.<InputStruct>) (*entity.<EntityName>, error) {
+                        // Validate input if needed
+                        assert.Equal(t, "Test Entity", input.Name)
+                        return expectedEntity, nil
+                    })
+            },
+            expectedStatus: http.StatusCreated, // or StatusOK
+            expectedResponse: map[string]interface{}{
+                "code": "ERR-200000",
+                "data": map[string]interface{}{
+                    "id":   testID.String(),
+                    "name": "Test Entity",
+                    "date": "2025-06-15T19:00:00+07:00",
+                },
+            },
+        },
+        {
+            name: "invalid request body - missing required fields",
+            requestBody: map[string]interface{}{
+                "name": "Test Entity",
+                // Missing required fields
+            },
+            setupMocks: func(h *testHelper) {
+                // No usecase calls expected for validation errors
+            },
+            expectedStatus: http.StatusBadRequest,
+            expectedResponse: map[string]interface{}{
+                "code":    "ERR-401000", // JSON binding error
+                "message": "unable to parse request",
+            },
+        },
+        {
+            name: "usecase validation error",
+            requestBody: map[string]interface{}{
+                "name": "Test Entity",
+                "date": "2025-06-15T19:00:00+07:00",
+            },
+            setupMocks: func(h *testHelper) {
+                h.mock<Usecase>.EXPECT().
+                    <Method>(gomock.Any(), gomock.Any()).
+                    Return(nil, errsFramework.NewBadRequestError("the request is invalid", nil))
+            },
+            expectedStatus: http.StatusBadRequest,
+            expectedResponse: map[string]interface{}{
+                "code":    "ERR-401000", // UseCase BadRequest error
+                "message": "the request is invalid",
+            },
+        },
+        {
+            name: "internal server error",
+            requestBody: map[string]interface{}{
+                "name": "Test Entity",
+                "date": "2025-06-15T19:00:00+07:00",
+            },
+            setupMocks: func(h *testHelper) {
+                h.mock<Usecase>.EXPECT().
+                    <Method>(gomock.Any(), gomock.Any()).
+                    Return(nil, errors.New("database connection failed"))
+            },
+            expectedStatus: http.StatusInternalServerError,
+            expectedResponse: map[string]interface{}{
+                "code":    "ERR-500000",
+                "message": "An unexpected error occurred. Please try again later.",
+            },
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            h := initTest(t)
+            defer h.Done()
+
+            // Setup mocks for this test case
+            tt.setupMocks(h)
+
+            // Create response recorder
+            w := httptest.NewRecorder()
+
+            // Build Gin context using testhelper
+            builder := testhelper.NewGinCtx(w).
+                Method(http.MethodPost). // or GET, PUT, DELETE
+                Path("/path")
+
+            // Add request body for POST/PUT requests
+            if tt.requestBody != nil {
+                builder = builder.JSONBody(tt.requestBody)
+            }
+
+            // Add path parameters
+            for key, value := range tt.pathParams {
+                builder = builder.Param(key, value)
+            }
+
+            // Add query parameters
+            for key, value := range tt.queryParams {
+                builder = builder.Query(key, value)
+            }
+
+            c := builder.
+                WithContext(logger.NewContext(context.Background(), logger.NewNoopLogger())).
+                MustBuild(t)
+
+            // Execute the handler
+            h.<handler>.<MethodName>(c)
+
+            // Assert HTTP status code
+            assert.Equal(t, tt.expectedStatus, w.Code)
+
+            // Assert response body
+            var responseBody map[string]interface{}
+            err := json.Unmarshal(w.Body.Bytes(), &responseBody)
+            require.NoError(t, err)
+
+            for key, expectedValue := range tt.expectedResponse {
+                actualValue, exists := responseBody[key]
+                assert.True(t, exists, "Expected key '%s' to exist in response", key)
+                assert.Equal(t, expectedValue, actualValue, "Mismatch for key '%s'", key)
+            }
+        })
+    }
+}
+```
+
 ## 🧪 Test Case Categories
 
 ### 1. **Happy Path Tests**
@@ -496,6 +720,68 @@ assert.Equal(t, expected.Name, actual.Name)
 ```go
 // Always verify all mock expectations were met (for database tests)
 h.AssertExpectationsMet(t)
+```
+
+## 🎯 HTTP Handler Test Patterns
+
+### **Testhelper ginctx Usage**
+```go
+// GET request with query parameters
+c := testhelper.NewGinCtx(w).
+    Method(http.MethodGet).
+    Path("/entities").
+    Queries(map[string]interface{}{
+        "page":  1,
+        "limit": 10,
+    }).
+    WithContext(logger.NewContext(context.Background(), logger.NewNoopLogger())).
+    MustBuild(t)
+
+// POST request with JSON body
+c := testhelper.NewGinCtx(w).
+    Method(http.MethodPost).
+    Path("/entities").
+    JSONBody(map[string]interface{}{
+        "name": "Test Entity",
+        "date": "2025-06-15T19:00:00+07:00",
+    }).
+    WithContext(logger.NewContext(context.Background(), logger.NewNoopLogger())).
+    MustBuild(t)
+
+// GET request with path parameters
+c := testhelper.NewGinCtx(w).
+    Method(http.MethodGet).
+    Path("/entities/:id").
+    Param("id", testID.String()).
+    WithContext(logger.NewContext(context.Background(), logger.NewNoopLogger())).
+    MustBuild(t)
+```
+
+### **Pagination Testing (for list endpoints)**
+```go
+// Create paginated result for tests
+mockPagination := entity.NewPagination(2, 10, 0)
+provider := func() ([]entity.<EntityName>, entity.PageProvider[entity.<EntityName>], entity.Pagination, error) {
+    return testEntities, nil, mockPagination, nil
+}
+paginatedResult, _ := entity.NewPage(provider)
+
+// Expected response structure
+expectedResponse := map[string]interface{}{
+    "code": "ERR-200000",
+    "data": []interface{}{
+        // ... entity data
+    },
+    "metadata": map[string]interface{}{
+        "pagination": map[string]interface{}{
+            "current_page": float64(1),
+            "limit":        float64(10),
+            "offset":       float64(0),
+            "page_count":   float64(1),
+            "total":        float64(2),
+        },
+    },
+}
 ```
 
 ## 🎯 Test Data Best Practices
