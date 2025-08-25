@@ -4,7 +4,7 @@
 # This Makefile provides a set of commands to manage the Go project, including building, testing, and generating database models.
 PKG := ticket-reservation
 GOLINT ?= golangci-lint
-GO_FILES = $(shell go list ./... | grep -v -e /mocks -e /example)
+GO_FILES = $(shell go list ./... | grep -v -e /mocks -e /example -e /model_gen)
 GO_BIN = $(shell go env GOPATH)/bin
 
 # Default target is help, which lists available commands.
